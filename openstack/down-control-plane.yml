@@ -4,7 +4,7 @@
 # openstackclient
 # openstacksdk
 
-- import_playbook: common.yaml
+- import_playbook: common.yml
 
 - hosts: all
   gather_facts: no

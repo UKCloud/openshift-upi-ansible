@@ -1,0 +1,3 @@
+# OpenShift Installer configuration files
+install-config.yaml
+clouds.yaml

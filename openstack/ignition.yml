@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  ansible_connection: local
+
+  tasks:
+  - name: Create Ignition configs
+    command:
+      cmd: openshift-install create ignition-configs
+
+

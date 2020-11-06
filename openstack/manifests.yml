@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  ansible_connection: local
+
+  tasks:
+  - name: Create manifests
+    command:
+      cmd: openshift-install create manifests
+
+  - name: Remove controlplane and compute machineset manifests
+    file:
+      state: absent
+      path: "openshift/{{ item }}"
+    with_fileglob:
+      - "openshift/99_openshift-cluster-api_master-machines-*.yaml"
+      - "openshift/openshift/99_openshift-cluster-api_worker-machineset-*.yaml"
+

@@ -2,7 +2,7 @@
   tasks:
   - name: Set pull secret var
     set_fact:
-      pullSecret: "{{ lookup('file', 'pull-secret.txt') }}"
+      pullSecret: "{{ lookup('file', 'pull-secret.txt') | from_json | to_json }}"
 
   - name: Set pull secret var
     set_fact:
@@ -13,8 +13,38 @@
       src: install-config.j2
       dest: install-config.yaml
 
+  - name: Backup install config
+    copy:
+      src: install-config.yaml
+      dest: install-config.yaml.bk
+
   - name: Create inventory file
     template:
       src: inventory.j2
       dest: inventory.yaml
+
+  - name: Generate manifests
+    command: openshift-install create manifests --dir=./
+
+  - name: Remove control plane manifests
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_fileglob:
+    - "openshift/99_openshift-cluster-api_master-machines-*.yaml"
      
+  - name: Set masters unschedulable in manifests
+    replace:
+      path: manifests/cluster-scheduler-02-config.yml
+      regexp: '^\s{2}mastersSchedulable: true$'
+      replace: '  mastersSchedulable: False'
+
+  - name: Generate ignition configs
+    command: openshift-install create ignition-configs --dir=./
+
+  - name: Register infra ID variable
+    command: jq -r .infraID metadata.json
+    register: infraID
+
+  - name: Run bootstrap.py
+    shell: export INFRA_ID=$(jq -r .infraID metadata.json) ; python bootstrap.py

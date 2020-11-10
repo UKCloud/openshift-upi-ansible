@@ -1,0 +1,6 @@
+clouds.yaml
+install-config.yaml
+inventory.yaml
+vars.yml.bk
+files/pubkey.pem.bk
+files/pull-secret.txt.bk

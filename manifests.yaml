@@ -1,0 +1,20 @@
+- hosts: localhost
+  tasks:
+  - name: Set pull secret var
+    set_fact:
+      pullSecret: "{{ lookup('file', 'pull-secret.txt') }}"
+
+  - name: Set pull secret var
+    set_fact:
+      sshKey: "{{ lookup('file', 'pubkey.pem') }}"
+
+  - name: Create install config
+    template:
+      src: install-config.j2
+      dest: install-config.yaml
+
+  - name: Create inventory file
+    template:
+      src: inventory.j2
+      dest: inventory.yaml
+     

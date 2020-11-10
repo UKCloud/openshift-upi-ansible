@@ -1,0 +1,8 @@
+ospSubnet:
+externalNetwork: 
+apiFIP: 
+ingressFIP:
+bootstrapFIP:
+custID: 
+baseDomain:
+rhcosImage:

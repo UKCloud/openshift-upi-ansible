@@ -72,3 +72,6 @@
     template:
       src: bootstrap-ignition.j2
       dest: "{{ infraID.stdout }}-bootstrap-ignition.json"
+
+  - name: Run master.sh
+    shell: export INFRA_ID=$(jq -r .infraID metadata.json) ; bash master.sh

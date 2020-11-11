@@ -31,8 +31,9 @@ platform:
     computeFlavor: ocp.m1.medium
     clusterOSImage: {{ rhcosImage }}
     externalDNS:
-    - 1.1.1.1
-    - 1.0.0.1
+{% for dnsServer in externalDNS %}
+    - {{ externalDNS }}
+{% endfor %}
     externalNetwork: internet
     ingressVIP: 10.0.0.7
     lbFloatingIP: {{ apiFIP }}

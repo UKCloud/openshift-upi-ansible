@@ -1,8 +1,9 @@
-ospSubnet:
-externalNetwork: 
-apiFIP: 
-ingressFIP:
-bootstrapFIP:
-custID: 
-baseDomain:
-rhcosImage:
+ospSubnet: <Subnet for machines>
+externalNetwork: <Network cluster is on>
+apiFIP: <FIP for controlplane>
+ingressFIP: <FIP for dataplane>
+bootstrapFIP: <FIP for bootstrap access>
+custID: <Estate API ID for cluster>
+baseDomain: <Base domain for OSP region>
+rhcosImage: <rhcos image present in OSP project>
+externalDNS: <List of 2 DNS servers>

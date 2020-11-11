@@ -48,3 +48,27 @@
 
   - name: Run bootstrap.py
     shell: export INFRA_ID=$(jq -r .infraID metadata.json) ; python bootstrap.py
+
+  - name: Upload bootstrap image
+    command:  openstack image create --disk-format=raw --container-format=bare --file bootstrap.ign bootstrap
+
+  - name: Register bootstrap image path
+    command: openstack image show bootstrap -c file -f value
+    register: filePath
+
+  - name: Register glance public endpoint
+    shell: openstack catalog show image -c endpoints | grep public | awk '{print $4}'
+    register: glanceUrl
+
+  - name: Register OpenStack token
+    command: openstack token issue -c id -f value
+    register: token
+
+  - name: Set full bootstrap image URL
+    set_fact:
+      bootstrapSource: "{{ glanceUrl.stdout }}{{ filePath.stdout }}"
+
+  - name: Create install config
+    template:
+      src: bootstrap-ignition.j2
+      dest: "{{ infraID.stdout }}-bootstrap-ignition.json"

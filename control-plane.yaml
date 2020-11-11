@@ -17,6 +17,8 @@
       network: "{{ os_network }}"
       security_groups:
       - "{{ os_sg_master }}"
+      - "{{ os_sg_api }}"
+      - "{{ os_sg_ssh }}"
       allowed_address_pairs:
       - ip_address: "{{ os_apiVIP }}"
       - ip_address: "{{ os_ingressVIP }}"

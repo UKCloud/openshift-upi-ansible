@@ -22,6 +22,10 @@
       # Security groups names
       os_sg_master: "{{ infraID }}-master"
       os_sg_worker: "{{ infraID }}-worker"
+      os_sg_infra: "{{ infraID }}-infra"
+      os_sg_api: "{{ infraID }}-api"
+      os_sg_ingress: "{{ infraID }}-ingress"
+      os_sg_ssh: "{{ infraID }}-ssh"
       # Server names
       os_bootstrap_server_name: "{{ infraID }}-bootstrap"
       os_cp_server_name: "{{ infraID }}-master"

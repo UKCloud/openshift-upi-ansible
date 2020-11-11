@@ -26,6 +26,38 @@
     command:
       cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_worker }} "
 
+  - name: 'Create the infra security group'
+    os_security_group:
+      name: "{{ os_sg_infra}}"
+
+  - name: 'Set infra security group tag'
+    command:
+      cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_infra }} "
+
+  - name: 'Create the API security group'
+    os_security_group:
+      name: "{{ os_sg_api }}"
+
+  - name: 'Set API security group tag'
+    command:
+      cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_api }} "
+
+  - name: 'Create the ingress security group'
+    os_security_group:
+      name: "{{ os_sg_ingress }}"
+
+  - name: 'Set ingress security group tag'
+    command:
+      cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_ingress }} "
+
+  - name: 'Create the SSH security group'
+    os_security_group:
+      name: "{{ os_sg_ssh }}"
+
+  - name: 'Set SSH security group tag'
+    command:
+      cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_ssh }} "
+
   - name: 'Create master-sg rule "ICMP"'
     os_security_group_rule:
       security_group: "{{ os_sg_master }}"
@@ -38,13 +70,6 @@
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 22623
       port_range_max: 22623
-
-  - name: 'Create master-sg rule "SSH"'
-    os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
-      protocol: tcp
-      port_range_min: 22
-      port_range_max: 22
 
   - name: 'Create master-sg rule "DNS (TCP)"'
     os_security_group_rule:
@@ -73,6 +98,7 @@
   - name: 'Create master-sg rule "OpenShift API"'
     os_security_group_rule:
       security_group: "{{ os_sg_master }}"
+      remote_ip_prefix: "{{ os_subnet_range }}"
       protocol: tcp
       port_range_min: 6443
       port_range_max: 6443
@@ -177,13 +203,6 @@
       security_group: "{{ os_sg_worker }}"
       protocol: icmp
 
-  - name: 'Create worker-sg rule "SSH"'
-    os_security_group_rule:
-      security_group: "{{ os_sg_worker }}"
-      protocol: tcp
-      port_range_min: 22
-      port_range_max: 22
-
   - name: 'Create worker-sg rule "mDNS"'
     os_security_group_rule:
       security_group: "{{ os_sg_worker }}"
@@ -191,20 +210,6 @@
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 5353
       port_range_max: 5353
-
-  - name: 'Create worker-sg rule "Ingress HTTP"'
-    os_security_group_rule:
-      security_group: "{{ os_sg_worker }}"
-      protocol: tcp
-      port_range_min: 80
-      port_range_max: 80
-
-  - name: 'Create worker-sg rule "Ingress HTTPS"'
-    os_security_group_rule:
-      security_group: "{{ os_sg_worker }}"
-      protocol: tcp
-      port_range_min: 443
-      port_range_max: 443
 
   - name: 'Create worker-sg rule "router"'
     os_security_group_rule:
@@ -275,3 +280,122 @@
       security_group: "{{ os_sg_worker }}"
       protocol: '112'
       remote_ip_prefix: "{{ os_subnet_range }}"
+
+
+  - name: 'Create infra-sg rule "ICMP"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: icmp
+
+  - name: 'Create infra-sg rule "mDNS"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 5353
+      port_range_max: 5353
+
+  - name: 'Create infra-sg rule "router"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 1936
+      port_range_max: 1936
+
+  - name: 'Create infra-sg rule "VXLAN"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 4789
+      port_range_max: 4789
+
+  - name: 'Create infra-sg rule "Geneve"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 6081
+      port_range_max: 6081
+
+  - name: 'Create infra-sg rule "infra ingress internal (TCP)"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create infra-sg rule "infra ingress internal (UDP)"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create infra-sg rule "infra ingress kubelet insecure"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 10250
+      port_range_max: 10250
+
+  - name: 'Create infra-sg rule "infra ingress services (TCP)"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+  - name: 'Create infra-sg rule "infra ingress services (UDP)"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+  - name: 'Create infra-sg rule "VRRP"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: '112'
+      remote_ip_prefix: "{{ os_subnet_range }}"
+
+
+  - name: 'Create api-sg rule "OpenShift API"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_api }}"
+      protocol: tcp
+      remote_ip_prefix: "0.0.0.0/0"
+      port_range_min: 6443
+      port_range_max: 6443
+
+
+  - name: 'Create ingress-sg rule "Ingress HTTP"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_ingress }}"
+      remote_ip_prefix: "0.0.0.0/0"
+      protocol: tcp
+      port_range_min: 80
+      port_range_max: 80
+
+  - name: 'Create ingress-sg rule "Ingress HTTPS"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_ingress }}"
+      remote_ip_prefix: "0.0.0.0/0"
+      protocol: tcp
+      port_range_min: 443
+      port_range_max: 443
+
+
+  - name: 'Create ssh-sg rule "SSH"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_ssh }}"
+      remote_ip_prefix: "0.0.0.0/0"
+      protocol: tcp
+      port_range_min: 22
+      port_range_max: 22

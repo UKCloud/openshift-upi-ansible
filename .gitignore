@@ -5,3 +5,4 @@ vars.yml.bk
 files/pubkey.pem.bk
 files/pull-secret.txt.bk
 inventory.yaml.bk
+pre-files/*

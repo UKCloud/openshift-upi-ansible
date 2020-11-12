@@ -1,7 +1,10 @@
 clouds.yaml
 install-config.yaml
+install-config.yaml.bk
 inventory.yaml
 vars.yml.bk
 files/pubkey.pem.bk
 files/pull-secret.txt.bk
 inventory.yaml.bk
+openshift-install
+.DS_Store

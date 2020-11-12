@@ -18,7 +18,6 @@
       security_groups:
       - "{{ os_sg_master }}"
       - "{{ os_sg_api }}"
-      - "{{ os_sg_ssh }}"
       allowed_address_pairs:
       - ip_address: "{{ os_apiVIP }}"
       - ip_address: "{{ os_ingressVIP }}"
@@ -59,7 +58,7 @@
 
   - name: 'Create the Control Plane server group'
     command:
-      cmd: "openstack --os-compute-api-version=2.15 server group create -f json -c id --policy=soft-anti-affinity {{ os_cp_server_group_name }}"
+      cmd: "openstack --os-compute-api-version=2.15 server group create -f json -c id --policy=anti-affinity {{ os_cp_server_group_name }}"
     register: server_group_created
     when:
     - server_group_id is not defined

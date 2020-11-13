@@ -1,0 +1,7 @@
+- import_playbook: server-groups.yaml
+- import_playbook: manifests.yaml
+- import_playbook: security-groups.yaml
+- import_playbook: network.yaml
+- import_playbook: bootstrap.yaml
+- import_playbook: control-plane.yaml
+

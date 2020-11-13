@@ -18,11 +18,6 @@
       src: install-config.yaml
       dest: install-config.yaml.bk
 
-  - name: Create inventory file
-    template:
-      src: inventory.j2
-      dest: inventory.yaml
-
   - name: Generate manifests
     command: openshift-install create manifests --dir=./
 
@@ -39,12 +34,18 @@
       regexp: '^\s{2}mastersSchedulable: true$'
       replace: '  mastersSchedulable: False'
 
+  - name: Set worker server groups
+    lineinfile:
+      path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
+      insertafter: '^\s{10}image.*$'
+      line: '          serverGroupID: {{ workerDefault.id }}'
+
   - name: Generate ignition configs
     command: openshift-install create ignition-configs --dir=./
 
   - name: Register infra ID variable
     command: jq -r .infraID metadata.json
-    register: infraID
+    register: infrastructureID
 
   - name: Run bootstrap.py
     shell: export INFRA_ID=$(jq -r .infraID metadata.json) ; python bootstrap.py
@@ -71,7 +72,7 @@
   - name: Create install config
     template:
       src: bootstrap-ignition.j2
-      dest: "{{ infraID.stdout }}-bootstrap-ignition.json"
+      dest: "{{ infrastructureID.stdout }}-bootstrap-ignition.json"
 
   - name: Run master.sh
     shell: export INFRA_ID=$(jq -r .infraID metadata.json) ; bash master.sh

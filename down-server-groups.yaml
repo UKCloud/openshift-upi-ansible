@@ -1,0 +1,10 @@
+- hosts: localhost
+  tasks:
+  - name: Remove server groups
+    openstack.cloud.server_group:
+      state: absent
+      name: "{{ item }}"
+    loop:
+    - "worker-default"
+    - "infra"
+    - "master"

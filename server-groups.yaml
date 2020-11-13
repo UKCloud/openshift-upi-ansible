@@ -1,0 +1,12 @@
+- hosts: localhost
+  tasks:
+  - name: Create default worker group
+    openstack.cloud.server_group:
+      state: present
+      name: worker-default
+      policies:
+      - anti-affinity
+    register: workerDefault
+
+  - debug:
+      var: workerDefault.id

@@ -7,6 +7,3 @@
       policies:
       - anti-affinity
     register: workerDefault
-
-  - debug:
-      var: workerDefault.id

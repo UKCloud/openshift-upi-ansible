@@ -1,6 +1,6 @@
 - hosts: localhost
   tasks:
-  - name: Create default worker group
+  - name: Remove default worker group
     openstack.cloud.server_group:
       state: absent
       name: worker-default

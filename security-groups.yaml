@@ -95,14 +95,6 @@
       port_range_min: 5353
       port_range_max: 5353
 
-  - name: 'Create master-sg rule "OpenShift API"'
-    os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
-      remote_ip_prefix: "{{ os_subnet_range }}"
-      protocol: tcp
-      port_range_min: 6443
-      port_range_max: 6443
-
   - name: 'Create master-sg rule "VXLAN"'
     os_security_group_rule:
       security_group: "{{ os_sg_master }}"
@@ -366,7 +358,15 @@
       remote_ip_prefix: "{{ os_subnet_range }}"
 
 
-  - name: 'Create api-sg rule "OpenShift API"'
+  - name: 'Create api-sg rule "OpenShift API" internal'
+    os_security_group_rule:
+      security_group: "{{ os_sg_api }}"
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      protocol: tcp
+      port_range_min: 6443
+      port_range_max: 6443
+
+  - name: 'Create api-sg rule "OpenShift API external"'
     os_security_group_rule:
       security_group: "{{ os_sg_api }}"
       protocol: tcp
@@ -375,7 +375,23 @@
       port_range_max: 6443
 
 
-  - name: 'Create ingress-sg rule "Ingress HTTP"'
+  - name: 'Create ingress-sg rule "Ingress HTTP internal"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_ingress }}"
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      protocol: tcp
+      port_range_min: 80
+      port_range_max: 80
+
+  - name: 'Create ingress-sg rule "Ingress HTTPS internal"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_ingress }}"
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      protocol: tcp
+      port_range_min: 443
+      port_range_max: 443
+
+  - name: 'Create ingress-sg rule "Ingress HTTP external"'
     os_security_group_rule:
       security_group: "{{ os_sg_ingress }}"
       remote_ip_prefix: "{{ os_ingress_allowed_sources }}"
@@ -383,7 +399,7 @@
       port_range_min: 80
       port_range_max: 80
 
-  - name: 'Create ingress-sg rule "Ingress HTTPS"'
+  - name: 'Create ingress-sg rule "Ingress HTTPS external"'
     os_security_group_rule:
       security_group: "{{ os_sg_ingress }}"
       remote_ip_prefix: "{{ os_ingress_allowed_sources }}"

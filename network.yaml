@@ -157,4 +157,6 @@
     command:
       cmd: "openstack floating ip set --port {{ os_port_ingress }} {{ os_ingress_fip }}"
     when: os_ingress_fip is defined and os_ingress_fip|length>0
-  
+
+  - name: Set DNS on subnet
+    command: openstack subnet set --dns-nameserver "{{ externalDNS[0] }}" --dns-nameserver "{{ externalDNS[1] }}"  "{{ infrastructureID.stdout }}-nodes"

@@ -59,11 +59,3 @@ all:
       # Be aware that the 10 and 11 of the machineNetwork will
       # be taken by neutron dhcp by default, and wont be available.
       os_ingressVIP: {% raw %}"{{  os_subnet_range | next_nth_usable(7) }}"{% endraw %}
-
-      os_api_allowed_sources: "{{ apiAllowedSources }}"
-      os_ingress_allowed_sources: "{{ ingressAllowedSources }}"
-      os_ssh_allowed_sources: "{{ sshAllowedSources }}"
-      os_subnet_dns_nameservers:
-{% for dnsServer in externalDNS %}
-      - {{ dnsServer }}
-{% endfor %}

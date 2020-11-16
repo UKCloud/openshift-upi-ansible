@@ -7,3 +7,6 @@ custID: <Estate API ID for cluster>
 baseDomain: <Base domain for OSP region>
 rhcosImage: <rhcos image present in OSP project>
 externalDNS: <List of 2 DNS servers>
+apiAllowedSources: "0.0.0.0/0"
+ingressAllowedSources: "0.0.0.0/0"
+sshAllowedSources: "0.0.0.0/0"

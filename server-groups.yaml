@@ -1,0 +1,25 @@
+- hosts: localhost
+  tasks:
+  - name: Create default worker server group
+    openstack.cloud.server_group:
+      state: present
+      name: worker-default
+      policies:
+      - soft-anti-affinity
+    register: workerDefault
+
+  - name: Create infra server group
+    openstack.cloud.server_group:
+      state: present
+      name: infra
+      policies:
+      - anti-affinity
+    register: infraGroup
+
+  - name: Create master server group
+    openstack.cloud.server_group:
+      state: present
+      name: master
+      policies:
+      - anti-affinity
+    register: masterGroup 

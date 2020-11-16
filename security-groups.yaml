@@ -370,7 +370,7 @@
     os_security_group_rule:
       security_group: "{{ os_sg_api }}"
       protocol: tcp
-      remote_ip_prefix: "{{ os_api_allowed_sources }}"
+      remote_ip_prefix: "{{ apiAllowedSources }}"
       port_range_min: 6443
       port_range_max: 6443
 
@@ -394,7 +394,7 @@
   - name: 'Create ingress-sg rule "Ingress HTTP external"'
     os_security_group_rule:
       security_group: "{{ os_sg_ingress }}"
-      remote_ip_prefix: "{{ os_ingress_allowed_sources }}"
+      remote_ip_prefix: "{{ ingressAllowedSources }}"
       protocol: tcp
       port_range_min: 80
       port_range_max: 80
@@ -402,7 +402,7 @@
   - name: 'Create ingress-sg rule "Ingress HTTPS external"'
     os_security_group_rule:
       security_group: "{{ os_sg_ingress }}"
-      remote_ip_prefix: "{{ os_ingress_allowed_sources }}"
+      remote_ip_prefix: "{{ ingressAllowedSources }}"
       protocol: tcp
       port_range_min: 443
       port_range_max: 443
@@ -411,7 +411,7 @@
   - name: 'Create ssh-sg rule "SSH"'
     os_security_group_rule:
       security_group: "{{ os_sg_ssh }}"
-      remote_ip_prefix: "{{ os_ssh_allowed_sources }}"
+      remote_ip_prefix: "{{ sshAllowedSources }}"
       protocol: tcp
       port_range_min: 22
       port_range_max: 22

@@ -1,0 +1,37 @@
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+# netaddr
+
+- import_playbook: common.yaml
+
+- hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: Register infra ID variable
+    command: jq -r .infraID metadata.json
+    register: infrastructureID
+
+  - name: Create bastion port
+    os_port:
+      name: "{{ infrastructureID.stdout }}-bastion-port"
+      network: "{{ os_network }}"
+      security_groups:
+      - "{{ os_sg_ssh }}"
+
+  - name: Create bastion server
+    os_server:
+      name: "{{ infrastructureID.stdout }}-bastion"
+      image: redhat-8.2-CURRENT
+      flavor: t1.large
+      floating_ips: "{{ os_bootstrap_fip | default(omit) }}"
+      auto_ip: "{{ bootstrap_auto_ip | default(omit) }}"
+      nics:
+      - port-name: "{{ infrastructureID.stdout }}-bastion-port"
+      userdata: |
+        #!/bin/bash
+        echo "{{ lookup('file', 'pubkey.pem') }}" >> /home/cloud-user/.ssh/authorized_keys
+        chmod 0600 /home/cloud-user/.ssh/authorized_keys

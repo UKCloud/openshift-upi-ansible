@@ -9,7 +9,7 @@
   gather_facts: no
 
   tasks:
-  - name: 'Remove the bootstrap server'
+  - name: 'Remove bootstrap server'
     os_server:
       name: "{{ os_bootstrap_server_name }}"
       state: absent

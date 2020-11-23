@@ -1,3 +1,5 @@
+# This script modifies the bootstrap ignition to be usable in deployment
+
 import base64
 import json
 import os

@@ -1,2 +1,0 @@
-# file showing needed dependancies for runs
-server-groups.yaml needs 'ansible-galaxy collection install openstack.cloud' ansible 2.9 or greater

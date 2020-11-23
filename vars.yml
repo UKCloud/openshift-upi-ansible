@@ -9,4 +9,4 @@ rhcosImage: <rhcos image present in OSP project>
 externalDNS: <List of 2 DNS servers>
 apiAllowedSources: "0.0.0.0/0"
 ingressAllowedSources: "0.0.0.0/0"
-sshAllowedSources: "0.0.0.0/0"
+sshAllowedSources: ["37.26.88.73/32","37.26.92.73/32","37.26.88.93/32","37.26.92.93/32"]

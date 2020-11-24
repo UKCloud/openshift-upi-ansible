@@ -1,4 +1,4 @@
-set -e
+set -xe
 
 ansible-galaxy collection install -r requirements.yml
 

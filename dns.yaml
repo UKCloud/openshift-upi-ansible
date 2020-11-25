@@ -3,11 +3,11 @@
   gather_facts: no
 
   vars:
-    domainSuffix: "{{ custID + '.' + baseDomain }}"
+    hostname: "{{ custID + '.' + baseDomain }}"
     subZone: "cna.ukcloud"
-    controlplaneDnsRecords:
+    apiDnsRecords:
       - api
-    dataplaneDnsRecords:
+    ingressDnsRecords:
       - "*.apps"
 
   tasks:
@@ -15,31 +15,31 @@
     set_fact:
       zone: "{{ subZone + baseDomain.split(subZone | string)[1] }}"
 
-  - name: Split domain suffix
+  - name: Split hostname
     set_fact:
-      clusterPrefix: "{{ domainSuffix.split(zone | string)[0] }}"
+      clusterPrefix: "{{ hostname.split(zone | string)[0] }}"
 
   - include_tasks: tasks/dns-retrieve-user-token.yaml
 
   - include_tasks: tasks/dns-verify-zone-exists.yaml
 
-  - name: Verify if controlplane record exists
+  - name: Verify if API record exists
     include_tasks: tasks/dns-verify-record.yaml
-    with_items: "{{ controlplaneDnsRecords | first }}"
+    with_items: "{{ apiDnsRecords | first }}"
     vars: 
       uriMethod: "GET"
       uriStatusCode: "200,404"
       dnsRecordType: "A"
 
-  - name: Fail when controlplane record exists but IP address is different
+  - name: Fail when API record exists but IP address is different
     fail:
       msg:
-        "Controlplane record exists with IP: {{ verifyRecordOutput.json.rrSets[0].rdata[0] }} provided IP was: {{ apiFIP }}"
+        "API record exists with IP: {{ verifyRecordOutput.json.rrSets[0].rdata[0] }} provided IP was: {{ apiFIP }}"
     when: verifyRecordOutput.status | int == 200 and not verifyRecordOutput.json.rrSets[0].rdata[0] == apiFIP
 
-  - name: Create controlplane DNS records
+  - name: Create API DNS records
     include_tasks: tasks/dns-create-record.yaml
-    with_items: "{{ controlplaneDnsRecords }}" 
+    with_items: "{{ apiDnsRecords }}" 
     vars:
       uriMethod: "POST"
       uriStatusCode: "201"
@@ -47,23 +47,23 @@
       dnsRecordType: "A"
     when: verifyRecordOutput.status | int == 404
 
-  - name: Verify if dataplane record exists
+  - name: Verify if Ingress record exists
     include_tasks: tasks/dns-verify-record.yaml
-    with_items: "{{ dataplaneDnsRecords | first }}"
+    with_items: "{{ ingressDnsRecords | first }}"
     vars: 
       uriMethod: "GET"
       uriStatusCode: "200,404"
       dnsRecordType: "A"
 
-  - name: Fail when dataplane record exists but IP address is different
+  - name: Fail when Ingress record exists but IP address is different
     fail:
       msg:
-        "Dataplane record exists with IP: {{ verifyRecordOutput.json.rrSets[0].rdata[0] }} provided IP was: {{ ingressFIP }}"
+        "Ingress record exists with IP: {{ verifyRecordOutput.json.rrSets[0].rdata[0] }} provided IP was: {{ ingressFIP }}"
     when: verifyRecordOutput.status | int == 200 and not verifyRecordOutput.json.rrSets[0].rdata[0] == ingressFIP
 
-  - name: Create dataplane DNS record
+  - name: Create Ingress DNS records
     include_tasks: tasks/dns-create-record.yaml
-    with_items: "{{ dataplaneDnsRecords }}"
+    with_items: "{{ ingressDnsRecords }}"
     vars:
       uriMethod: "POST"
       uriStatusCode: "201"

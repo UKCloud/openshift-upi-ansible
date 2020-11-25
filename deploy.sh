@@ -6,6 +6,8 @@ ansible-playbook -e @vars.yml generate-clouds.yaml
 
 ansible-playbook -e @vars.yml generate-inventory.yaml
 
+ansible-playbook -e @vars.yml dns.yaml
+
 ansible-playbook -i inventory.yaml -e @vars.yml deploy.yaml
 
 openshift-install wait-for bootstrap-complete

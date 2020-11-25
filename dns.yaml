@@ -1,0 +1,72 @@
+---
+- hosts: localhost
+  gather_facts: no
+
+  vars:
+    domainSuffix: "{{ custID + '.' + baseDomain }}"
+    subZone: "cna.ukcloud"
+    controlplaneDnsRecords:
+      - api
+    dataplaneDnsRecords:
+      - "*.apps"
+
+  tasks:
+  - name: Determine zone
+    set_fact:
+      zone: "{{ subZone + baseDomain.split(subZone | string)[1] }}"
+
+  - name: Split domain suffix
+    set_fact:
+      clusterPrefix: "{{ domainSuffix.split(zone | string)[0] }}"
+
+  - include_tasks: tasks/dns-retrieve-user-token.yaml
+
+  - include_tasks: tasks/dns-verify-zone-exists.yaml
+
+  - name: Verify if controlplane record exists
+    include_tasks: tasks/dns-verify-record.yaml
+    with_items: "{{ controlplaneDnsRecords | first }}"
+    vars: 
+      uriMethod: "GET"
+      uriStatusCode: "200,404"
+      dnsRecordType: "A"
+
+  - name: Fail when controlplane record exists but IP address is different
+    fail:
+      msg:
+        "Controlplane record exists with IP: {{ verifyRecordOutput.json.rrSets[0].rdata[0] }} provided IP was: {{ apiFIP }}"
+    when: verifyRecordOutput.status | int == 200 and not verifyRecordOutput.json.rrSets[0].rdata[0] == apiFIP
+
+  - name: Create controlplane DNS records
+    include_tasks: tasks/dns-create-record.yaml
+    with_items: "{{ controlplaneDnsRecords }}" 
+    vars:
+      uriMethod: "POST"
+      uriStatusCode: "201"
+      dns_record_data: "{{ apiFIP }}"
+      dnsRecordType: "A"
+    when: verifyRecordOutput.status | int == 404
+
+  - name: Verify if dataplane record exists
+    include_tasks: tasks/dns-verify-record.yaml
+    with_items: "{{ dataplaneDnsRecords | first }}"
+    vars: 
+      uriMethod: "GET"
+      uriStatusCode: "200,404"
+      dnsRecordType: "A"
+
+  - name: Fail when dataplane record exists but IP address is different
+    fail:
+      msg:
+        "Dataplane record exists with IP: {{ verifyRecordOutput.json.rrSets[0].rdata[0] }} provided IP was: {{ ingressFIP }}"
+    when: verifyRecordOutput.status | int == 200 and not verifyRecordOutput.json.rrSets[0].rdata[0] == ingressFIP
+
+  - name: Create dataplane DNS record
+    include_tasks: tasks/dns-create-record.yaml
+    with_items: "{{ dataplaneDnsRecords }}"
+    vars:
+      uriMethod: "POST"
+      uriStatusCode: "201"
+      dns_record_data: "{{ ingressFIP }}"
+      dnsRecordType: "A"
+    when: verifyRecordOutput.status | int == 404

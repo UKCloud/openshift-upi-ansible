@@ -1,0 +1,15 @@
+---
+  - block:
+    - name: Verify zone exists
+      uri:
+        url: https://api.ultradns.com/zones/{{ zone }}
+        headers:
+          Authorization: "Bearer {{ login_response.json.access_token }}"
+        method: GET
+        status_code: 200
+      register: zoneOutput
+    rescue:
+      - name: Output reason for failure
+        fail:
+          msg:
+            "{{ zoneOutput.json | json_query('[*].errorMessage') }}"

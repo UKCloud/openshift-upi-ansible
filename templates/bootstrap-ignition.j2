@@ -1,0 +1,14 @@
+{
+  "ignition": {
+    "config": {
+      "merge": [{
+        "source": "{{ bootstrapSource }}", 
+        "httpHeaders": [{
+          "name": "X-Auth-Token", 
+          "value": "{{ token.stdout }}" 
+        }]
+      }]
+    },
+    "version": "3.1.0"
+  }
+}

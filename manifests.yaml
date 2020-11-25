@@ -1,0 +1,78 @@
+- hosts: localhost
+  tasks:
+  - name: Set pull secret var
+    set_fact:
+      pullSecret: "{{ lookup('file', 'pull-secret.txt') | from_json | to_json }}"
+
+  - name: Set pull secret var
+    set_fact:
+      sshKey: "{{ lookup('file', 'pubkey.pem') }}"
+
+  - name: Create install config
+    template:
+      src: install-config.j2
+      dest: install-config.yaml
+
+  - name: Backup install config
+    copy:
+      src: install-config.yaml
+      dest: install-config.yaml.bk
+
+  - name: Generate manifests
+    command: openshift-install create manifests --dir=./
+
+  - name: Remove control plane manifests
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_fileglob:
+    - "openshift/99_openshift-cluster-api_master-machines-*.yaml"
+     
+  - name: Set masters unschedulable in manifests
+    replace:
+      path: manifests/cluster-scheduler-02-config.yml
+      regexp: '^\s{2}mastersSchedulable: true$'
+      replace: '  mastersSchedulable: False'
+
+  - name: Set worker server groups
+    lineinfile:
+      path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
+      insertafter: '^\s{10}image.*$'
+      line: '          serverGroupID: {{ workerDefault.id }}'
+
+  - name: Generate ignition configs
+    command: openshift-install create ignition-configs --dir=./
+
+  - name: Register infra ID variable
+    command: jq -r .infraID metadata.json
+    register: infrastructureID
+
+  - name: Run bootstrap.py
+    shell: export INFRA_ID=$(jq -r .infraID metadata.json) ; python bootstrap.py
+
+  - name: Upload bootstrap image
+    command:  openstack image create --disk-format=raw --container-format=bare --file bootstrap.ign bootstrap
+
+  - name: Register bootstrap image path
+    command: openstack image show bootstrap -c file -f value
+    register: filePath
+
+  - name: Register glance public endpoint
+    shell: openstack catalog show image -c endpoints | grep public | awk '{print $4}'
+    register: glanceUrl
+
+  - name: Register OpenStack token
+    command: openstack token issue -c id -f value
+    register: token
+
+  - name: Set full bootstrap image URL
+    set_fact:
+      bootstrapSource: "{{ glanceUrl.stdout }}{{ filePath.stdout }}"
+
+  - name: Create install config
+    template:
+      src: bootstrap-ignition.j2
+      dest: "{{ infrastructureID.stdout }}-bootstrap-ignition.json"
+
+  - name: Run master.sh
+    shell: export INFRA_ID=$(jq -r .infraID metadata.json) ; bash master.sh

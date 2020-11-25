@@ -1,0 +1,6 @@
+- hosts: localhost
+  tasks:
+  - name: Generate clouds.yaml
+    template:
+      src: clouds.j2
+      dest: clouds.yaml

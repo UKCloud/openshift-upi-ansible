@@ -1,0 +1,15 @@
+---
+  - block:
+    - name: Verify DNS record
+      uri:
+        url: "https://api.ultradns.com/zones/{{ zone }}/rrsets/{{ dnsRecordType }}/{{ item }}.{{ clusterPrefix }}"
+        headers:
+          Authorization: "Bearer {{ login_response.json.access_token }}"
+        method: "{{ uriMethod }}"
+        status_code: "{{ uriStatusCode }}"
+      register: verifyRecordOutput
+    rescue:
+      - name: Output reason for failure
+        fail:
+          msg:
+            "{{ verifyRecordOutput.json | json_query('[*].errorMessage') }}"

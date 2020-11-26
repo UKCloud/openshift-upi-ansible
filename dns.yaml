@@ -1,0 +1,72 @@
+---
+- hosts: localhost
+  gather_facts: no
+
+  vars:
+    hostname: "{{ custID + '.' + baseDomain }}"
+    subZone: "cna.ukcloud"
+    apiDnsRecords:
+      - api
+    ingressDnsRecords:
+      - "*.apps"
+
+  tasks:
+  - name: Determine zone
+    set_fact:
+      zone: "{{ subZone + baseDomain.split(subZone | string)[1] }}"
+
+  - name: Split hostname
+    set_fact:
+      clusterPrefix: "{{ hostname.split(zone | string)[0] }}"
+
+  - include_tasks: tasks/dns-retrieve-user-token.yaml
+
+  - include_tasks: tasks/dns-verify-zone-exists.yaml
+
+  - name: Verify if API record exists
+    include_tasks: tasks/dns-verify-record.yaml
+    with_items: "{{ apiDnsRecords | first }}"
+    vars: 
+      uriMethod: "GET"
+      uriStatusCode: "200,404"
+      dnsRecordType: "A"
+
+  - name: Fail when API record exists but IP address is different
+    fail:
+      msg:
+        "API record exists with IP: {{ verifyRecordOutput.json.rrSets[0].rdata[0] }} provided IP was: {{ apiFIP }}"
+    when: verifyRecordOutput.status | int == 200 and not verifyRecordOutput.json.rrSets[0].rdata[0] == apiFIP
+
+  - name: Create API DNS records
+    include_tasks: tasks/dns-create-record.yaml
+    with_items: "{{ apiDnsRecords }}" 
+    vars:
+      uriMethod: "POST"
+      uriStatusCode: "201"
+      dns_record_data: "{{ apiFIP }}"
+      dnsRecordType: "A"
+    when: verifyRecordOutput.status | int == 404
+
+  - name: Verify if Ingress record exists
+    include_tasks: tasks/dns-verify-record.yaml
+    with_items: "{{ ingressDnsRecords | first }}"
+    vars: 
+      uriMethod: "GET"
+      uriStatusCode: "200,404"
+      dnsRecordType: "A"
+
+  - name: Fail when Ingress record exists but IP address is different
+    fail:
+      msg:
+        "Ingress record exists with IP: {{ verifyRecordOutput.json.rrSets[0].rdata[0] }} provided IP was: {{ ingressFIP }}"
+    when: verifyRecordOutput.status | int == 200 and not verifyRecordOutput.json.rrSets[0].rdata[0] == ingressFIP
+
+  - name: Create Ingress DNS records
+    include_tasks: tasks/dns-create-record.yaml
+    with_items: "{{ ingressDnsRecords }}"
+    vars:
+      uriMethod: "POST"
+      uriStatusCode: "201"
+      dns_record_data: "{{ ingressFIP }}"
+      dnsRecordType: "A"
+    when: verifyRecordOutput.status | int == 404

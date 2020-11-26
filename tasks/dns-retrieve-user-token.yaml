@@ -1,0 +1,16 @@
+---
+  - block:
+    - name: Retrieve user token
+      uri:
+        url: https://api.ultradns.com/v2/authorization/token
+        method: POST
+        body_format: form-urlencoded
+        body: "grant_type=password&username={{ neustarUltraDnsUsername }}&password={{ neustarUltraDnsPassword | urlencode() }}"
+        return_content: yes
+      register: login_response
+      failed_when: "'access_token' not in login_response.json"
+    rescue:
+      - name: Output reason for failure
+        fail:
+          msg:
+            "{{ login_response.json | json_query('errorMessage') }}"

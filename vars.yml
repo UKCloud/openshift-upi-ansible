@@ -10,3 +10,5 @@ externalDNS: <List of 2 DNS servers>
 apiAllowedSources: ["0.0.0.0/0"]
 ingressAllowedSources: ["0.0.0.0/0"]
 sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format>
+neustarUltraDnsUsername: "username"
+neustarUltraDnsPassword: "password"

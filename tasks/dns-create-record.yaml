@@ -1,0 +1,17 @@
+---
+  - block:
+    - name: Create DNS record
+      uri:
+        url: "https://api.ultradns.com/zones/{{ zone }}/rrsets/{{ dnsRecordType }}/{{ item }}.{{ clusterPrefix }}"
+        headers:
+          Authorization: "Bearer {{ login_response.json.access_token }}"
+        method: "{{ uriMethod }}"
+        body_format: json
+        body: "{{ lookup('template', '../templates/dns-record.j2') }}"
+        status_code: "{{ uriStatusCode }}"
+      register: createRecordOutput
+    rescue:
+      - name: Output reason for failure
+        fail:
+          msg:
+            "{{ createRecordOutput.json | json_query('[*].errorMessage') }}"

@@ -357,6 +357,21 @@
       protocol: '112'
       remote_ip_prefix: "{{ os_subnet_range }}"
 
+  - name: 'Create infra-sg rule "Ingress HTTP internal"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      protocol: tcp
+      port_range_min: 80
+      port_range_max: 80
+
+  - name: 'Create infra-sg rule "Ingress HTTPS internal"'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      protocol: tcp
+      port_range_min: 443
+      port_range_max: 443
 
   - name: 'Create api-sg rule "OpenShift API" internal'
     os_security_group_rule:

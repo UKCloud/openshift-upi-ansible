@@ -46,7 +46,7 @@
       insertafter: '^\s{6}metadata:$'
       line: '        labels:'
 
-  - name: Add label
+  - name: Add label for default node selector
     lineinfile:
       path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
       insertafter: '^\s{8}labels:$'

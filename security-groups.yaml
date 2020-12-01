@@ -189,7 +189,6 @@
       protocol: '112'
       remote_ip_prefix: "{{ os_subnet_range }}"
 
-
   - name: 'Create worker-sg rule "ICMP"'
     os_security_group_rule:
       security_group: "{{ os_sg_worker }}"
@@ -272,7 +271,6 @@
       security_group: "{{ os_sg_worker }}"
       protocol: '112'
       remote_ip_prefix: "{{ os_subnet_range }}"
-
 
   - name: 'Create infra-sg rule "ICMP"'
     os_security_group_rule:

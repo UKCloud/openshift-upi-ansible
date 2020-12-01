@@ -7,4 +7,5 @@ ADD . /usr/local/playbooks
 # Upgrade pip
 RUN pip3 install --upgrade pip
 
-ENTRYPOINT /usr/local/playbooks/deploy.sh
+WORKDIR /usr/local/playbooks
+ENTRYPOINT ./deploy.sh

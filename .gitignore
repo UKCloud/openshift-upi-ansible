@@ -14,4 +14,3 @@ auth/
 *.ign
 metadata.json
 *-ignition.json
-ssh-key/*

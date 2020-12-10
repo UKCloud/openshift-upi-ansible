@@ -1,8 +1,8 @@
 set -xe
 
-ssh-keygen -t rsa -b 4096 -N '' -f ssh-key/openshift_key
+ssh-keygen -t rsa -b 4096 -N '' -f openshift_key
 
-cp ssh-key/openshift_key.pub files/pubkey.pem
+cp openshift_key.pub files/pubkey.pem
 
 ansible-galaxy collection install -r requirements.yml
 

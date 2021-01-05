@@ -19,7 +19,7 @@
   - name: Create master server group
     openstack.cloud.server_group:
       state: present
-      name: master
+      name: controlplane
       policies:
       - anti-affinity
-    register: masterGroup 
+    register: controlplaneGroup 

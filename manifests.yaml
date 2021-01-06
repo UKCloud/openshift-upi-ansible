@@ -28,7 +28,7 @@
     with_fileglob:
     - "openshift/99_openshift-cluster-api_master-machines-*.yaml"
      
-  - name: Set masters unschedulable in manifests
+  - name: Set controlplane nodes unschedulable in manifests
     replace:
       path: manifests/cluster-scheduler-02-config.yml
       regexp: '^\s{2}mastersSchedulable: true$'
@@ -92,5 +92,5 @@
       src: bootstrap-ignition.j2
       dest: "{{ infrastructureID.stdout }}-bootstrap-ignition.json"
 
-  - name: Run master.sh
-    shell: export INFRA_ID=$(jq -r .infraID metadata.json) ; bash master.sh
+  - name: Run controlplane.sh
+    shell: export INFRA_ID=$(jq -r .infraID metadata.json) ; bash controlplane.sh

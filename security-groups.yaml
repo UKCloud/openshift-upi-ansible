@@ -10,13 +10,13 @@
   gather_facts: no
 
   tasks:
-  - name: 'Create the master security group'
+  - name: 'Create the controlplane security group'
     os_security_group:
-      name: "{{ os_sg_master }}"
+      name: "{{ os_sg_controlplane }}"
 
-  - name: 'Set master security group tag'
+  - name: 'Set controlplane security group tag'
     command:
-      cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_master }} "
+      cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_controlplane }} "
 
   - name: 'Create the worker security group'
     os_security_group:
@@ -58,134 +58,134 @@
     command:
       cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_ssh }} "
 
-  - name: 'Create master-sg rule "ICMP"'
+  - name: 'Create controlplane-sg rule "ICMP"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: icmp
 
-  - name: 'Create master-sg rule "machine config server"'
+  - name: 'Create controlplane-sg rule "machine config server"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: tcp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 22623
       port_range_max: 22623
 
-  - name: 'Create master-sg rule "DNS (TCP)"'
+  - name: 'Create controlplane-sg rule "DNS (TCP)"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       remote_ip_prefix: "{{ os_subnet_range }}"
       protocol: tcp
       port_range_min: 53
       port_range_max: 53
 
-  - name: 'Create master-sg rule "DNS (UDP)"'
+  - name: 'Create controlplane-sg rule "DNS (UDP)"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       remote_ip_prefix: "{{ os_subnet_range }}"
       protocol: udp
       port_range_min: 53
       port_range_max: 53
 
-  - name: 'Create master-sg rule "mDNS"'
+  - name: 'Create controlplane-sg rule "mDNS"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       remote_ip_prefix: "{{ os_subnet_range }}"
       protocol: udp
       port_range_min: 5353
       port_range_max: 5353
 
-  - name: 'Create master-sg rule "VXLAN"'
+  - name: 'Create controlplane-sg rule "VXLAN"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: udp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 4789
       port_range_max: 4789
 
-  - name: 'Create master-sg rule "Geneve"'
+  - name: 'Create controlplane-sg rule "Geneve"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: udp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 6081
       port_range_max: 6081
 
-  - name: 'Create master-sg rule "ovndb"'
+  - name: 'Create controlplane-sg rule "ovndb"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: tcp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 6641
       port_range_max: 6642
 
-  - name: 'Create master-sg rule "master ingress internal (TCP)"'
+  - name: 'Create controlplane-sg rule "controlplane ingress internal (TCP)"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: tcp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 9000
       port_range_max: 9999
 
-  - name: 'Create master-sg rule "master ingress internal (UDP)"'
+  - name: 'Create controlplane-sg rule "controlplane ingress internal (UDP)"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: udp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 9000
       port_range_max: 9999
 
-  - name: 'Create master-sg rule "kube scheduler"'
+  - name: 'Create controlplane-sg rule "kube scheduler"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: tcp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 10259
       port_range_max: 10259
 
-  - name: 'Create master-sg rule "kube controller manager"'
+  - name: 'Create controlplane-sg rule "kube controller manager"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: tcp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 10257
       port_range_max: 10257
 
-  - name: 'Create master-sg rule "master ingress kubelet secure"'
+  - name: 'Create controlplane-sg rule "controlplane ingress kubelet secure"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: tcp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 10250
       port_range_max: 10250
 
-  - name: 'Create master-sg rule "etcd"'
+  - name: 'Create controlplane-sg rule "etcd"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: tcp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 2379
       port_range_max: 2380
 
-  - name: 'Create master-sg rule "master ingress services (TCP)"'
+  - name: 'Create controlplane-sg rule "controlplane ingress services (TCP)"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: tcp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 30000
       port_range_max: 32767
 
-  - name: 'Create master-sg rule "master ingress services (UDP)"'
+  - name: 'Create controlplane-sg rule "controlplane ingress services (UDP)"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: udp
       remote_ip_prefix: "{{ os_subnet_range }}"
       port_range_min: 30000
       port_range_max: 32767
 
-  - name: 'Create master-sg rule "VRRP"'
+  - name: 'Create controlplane-sg rule "VRRP"'
     os_security_group_rule:
-      security_group: "{{ os_sg_master }}"
+      security_group: "{{ os_sg_controlplane }}"
       protocol: '112'
       remote_ip_prefix: "{{ os_subnet_range }}"
 

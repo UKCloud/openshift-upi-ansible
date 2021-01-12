@@ -16,19 +16,19 @@
       name: "{{ item.1 }}-{{ item.0 }}"
       network: "{{ os_network }}"
       security_groups:
-      - "{{ os_sg_master }}"
+      - "{{ os_sg_controlplane }}"
       - "{{ os_sg_api }}"
       - "{{ os_sg_ssh }}"
       allowed_address_pairs:
       - ip_address: "{{ os_apiVIP }}"
       - ip_address: "{{ os_ingressVIP }}"
-    with_indexed_items: "{{ [os_port_master] * os_cp_nodes_number }}"
+    with_indexed_items: "{{ [os_port_controlplane] * os_cp_nodes_number }}"
     register: ports
 
   - name: 'Set Control Plane ports tag'
     command:
       cmd: "openstack port set --tag {{ cluster_id_tag }} {{ item.1 }}-{{ item.0 }}"
-    with_indexed_items: "{{ [os_port_master] * os_cp_nodes_number }}"
+    with_indexed_items: "{{ [os_port_controlplane] * os_cp_nodes_number }}"
 
   - name: 'List the Control Plane Trunks'
     command:
@@ -48,15 +48,15 @@
     os_server:
       name: "{{ item.1 }}-{{ item.0 }}"
       image: "{{ os_image_rhcos }}"
-      flavor: "{{ os_flavor_master }}"
+      flavor: "{{ os_flavor_controlplane }}"
       auto_ip: no
       # The ignition filename will be concatenated with the Control Plane node
       # name and its 0-indexed serial number.
       # In this case, the first node will look for this filename:
-      #    "{{ infraID }}-master-0-ignition.json"
+      #    "{{ infraID }}-controlplane-0-ignition.json"
       userdata: "{{ lookup('file', [item.1, item.0, 'ignition.json'] | join('-')) | string }}"
       nics:
-      - port-name: "{{ os_port_master }}-{{ item.0 }}"
+      - port-name: "{{ os_port_controlplane }}-{{ item.0 }}"
       scheduler_hints:
-        group: "{{ masterGroup.id }}"
+        group: "{{ controlplaneGroup.id }}"
     with_indexed_items: "{{ [os_cp_server_name] * os_cp_nodes_number }}"

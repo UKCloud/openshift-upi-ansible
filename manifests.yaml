@@ -40,17 +40,11 @@
       insertafter: '^\s{10}image.*$'
       line: '          serverGroupID: {{ workerDefault.id }}'
 
-  - name: Add labels yaml block
-    lineinfile:
-      path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
-      insertafter: '^\s{6}metadata:$'
-      line: '        labels:'
-
   - name: Add label for default node selector
-    lineinfile:
+    replace:
       path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
-      insertafter: '^\s{8}labels:$'
-      line: '          node-role.kubernetes.io/app: ""'
+      regexp: '^\s{6}metadata:.*'
+      replace: '      metadata:\n        labels:\n          node-role.kubernetes.io/app: ""'      
 
   - name: Set worker scale to 2
     replace:

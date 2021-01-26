@@ -9,6 +9,13 @@ all:
       os_flavor_controlplane: 'ocp.m1.medium'
       os_flavor_worker: 'ocp.m1.medium'
       os_image_rhcos: "{{ rhcosImage }}"
+
+      # Net2 values
+      net2: {{ net2 }}
+      os_net2_subnet_range: "{{ net2OspSubnet }}"
+      os_net2_external_network: "{{ net2ExternalNetwork }}"
+      os_net2_ingress_fip: "{{ net2IngressFIP }}"
+
       # Service subnet cidr
       svc_subnet_range: '172.30.0.0/16'
       os_svc_network_range: '172.30.0.0/15'

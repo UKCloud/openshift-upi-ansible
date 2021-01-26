@@ -6,7 +6,8 @@ bootstrapFIP: <FIP for bootstrap access>
 custID: <Estate API ID for cluster>
 baseDomain: <Base domain for OSP region>
 rhcosImage: <rhcos image present in OSP project>
-externalDNS: <List of 2 DNS servers>
+externalDNS: <List of 2 DNS servers> 
+externalDNSisOnNet2: False 
 apiAllowedSources: ["0.0.0.0/0"]
 ingressAllowedSources: ["0.0.0.0/0"]
 sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format>
@@ -17,5 +18,12 @@ net2: <boolean>
 net2OspSubnet: <Subnet for net2 machines>
 net2ExternalNetwork: <External Network net2>
 net2IngressFIP: <FIP for net2 ingress>
-net2ExternalDNS: <List of 2 DNS servers>
 net2IngressAllowedSources: ["0.0.0.0/0"]
+
+# A list of destinations that will be routed back towards the Primary Cluster network router;
+# These are implemented as neutron routes on the Net2 subnet
+# Should include:
+# - IP of disconnected installation registry (include any ECS/S3 endpoint IP it uses)
+# - API endpoint of OpenStack cloud
+# (if necessary, automatic routes are added for DNS if externalDNSisNet2 is False)
+net2RoutesViaPriNetwork: ["1.2.3.4/32", "5.6.7.8/32"]

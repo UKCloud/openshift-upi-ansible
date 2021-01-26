@@ -45,6 +45,7 @@
 
   - name: 'Net2 Compute resource names'
     set_fact:
+      os_net2_network_tag: "{{ infraID }}-net2Network"
       os_net2_network: "{{ infraID }}-net2-network"
       os_net2_subnet: "{{ infraID }}-net2-nodes"
       os_net2_router: "{{ infraID }}-net2-external-router"

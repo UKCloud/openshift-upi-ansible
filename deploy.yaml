@@ -2,6 +2,12 @@
 - import_playbook: manifests.yaml
 - import_playbook: security-groups.yaml
 - import_playbook: network.yaml
+
+- import_playbook: net2-security-groups.yaml
+  when: net2 | default(false) | bool
+- import_playbook: net2-network.yaml
+  when: net2 | default(false) | bool
+  
 - import_playbook: bootstrap.yaml
 - import_playbook: control-plane.yaml
 

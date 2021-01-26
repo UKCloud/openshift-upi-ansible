@@ -42,3 +42,14 @@
       os_svc_subnet: "{{ infraID }}-kuryr-service-subnet"
       # Ignition files
       os_bootstrap_ignition: "{{ infraID }}-bootstrap-ignition.json"
+
+  - name: 'Net2 Compute resource names'
+    set_fact:
+      os_net2_network: "{{ infraID }}-net2-network"
+      os_net2_subnet: "{{ infraID }}-net2-nodes"
+      os_net2_router: "{{ infraID }}-net2-external-router"
+      # Port names
+      os_net2_port_ingress: "{{ infraID }}-net2-ingress-port"     
+      # Security groups names
+      os_net2_sg_worker: "{{ infraID }}-net2-worker"
+      os_net2_sg_ingress: "{{ infraID }}-net2-ingress"

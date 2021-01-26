@@ -1,0 +1,68 @@
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+# netaddr
+
+- import_playbook: common.yaml
+
+- hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: 'Create the Net2 network'
+    os_network:
+      name: "{{ os_net2_network }}"
+
+  - name: 'Set tags on the  primary cluster network'
+    command:
+      cmd: "openstack network set --tag {{ primary_cluster_network_tag }} --tag {{ cluster_id_tag }} {{ os_net2_network }}"
+
+  - name: 'Create the Net2 subnet'
+    os_subnet:
+      name: "{{ os_net2_subnet }}"
+      network_name: "{{ os_net2_network }}"
+      cidr: "{{ os_net2_subnet_range }}"
+      allocation_pool_start: "{{ os_net2_subnet_range | next_nth_usable(10) }}"
+      allocation_pool_end: "{{ os_net2_subnet_range | ipaddr('last_usable') }}"
+
+  - name: 'Set tags on Net2 subnet'
+    command:
+      cmd: "openstack subnet set --tag {{ cluster_id_tag }} {{ os_net2_subnet }}"
+
+# Kuryr tasks removed
+
+  - name: 'Create Net2 external router'
+    os_router:
+      name: "{{ os_net2_router }}"
+      network: "{{ os_net2_external_network }}"
+      interfaces:
+      - "{{ os_net2_subnet }}"
+    when: os_net2_external_network is defined and os_net2_external_network|length>0
+
+# Kuryr tasks removed
+
+  - name: 'Create the Net2 Ingress port'
+    os_port:
+      name: "{{ os_net2_port_ingress }}"
+      network: "{{ os_net2_network }}"
+      security_groups:
+      - "{{ os_sg_ingress }}"
+      fixed_ips:
+      - subnet: "{{ os_net2_subnet }}"
+        ip_address: "{{ os_net2_ingressVIP }}"
+
+  - name: 'Set the Net2 Ingress port tag'
+    command:
+      cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_net2_port_ingress }}"
+
+  # NOTE: openstack ansible module doesn't allow attaching Floating IPs to
+  # ports, let's use the CLI instead
+  - name: 'Attach the Net2 Ingress floating IP to Ingress port'
+    command:
+      cmd: "openstack floating ip set --port {{ os_net2_port_ingress }} {{ os_net2_ingress_fip }}"
+    when: os_net2_ingress_fip is defined and os_net2_ingress_fip|length>0
+
+  - name: Set DNS on subnet
+    command: openstack subnet set --dns-nameserver "{{ net2ExternalDNS[0] }}" --dns-nameserver "{{ net2ExternalDNS[1] }}"  "{{ os_net2_subnet }}"

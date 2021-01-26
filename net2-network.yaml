@@ -44,13 +44,13 @@
   - name: 'Update primary external router to add interface on the net2 network'
     os_router:
       name: "{{ os_router }}"
-	  state: present
+      state: present
       network: "{{ os_external_network }}"
       interfaces:
       - "{{ os_subnet }}"
-	    - net: "{{ os_net2_network }}"
-	      subnet: "{{ os_net2_subnet }}"
-		    portip: "{{ os_net2_cluster_net_router_ip }}"
+      - net: "{{ os_net2_network }}"
+        subnet: "{{ os_net2_subnet }}"
+        portip: "{{ os_net2_cluster_net_router_ip }}"
     when: os_external_network is defined and os_external_network|length>0    
 
   - name: 'Add route on Net2 router to allow access to primary network'

@@ -12,3 +12,10 @@ ingressAllowedSources: ["0.0.0.0/0"]
 sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format>
 neustarUltraDnsUsername: "username"
 neustarUltraDnsPassword: "password"
+
+net2: <boolean>
+net2OspSubnet: <Subnet for net2 machines>
+net2ExternalNetwork: <External Network net2>
+net2IngressFIP: <FIP for net2 ingress>
+net2ExternalDNS: <List of 2 DNS servers>
+net2IngressAllowedSources: ["0.0.0.0/0"]

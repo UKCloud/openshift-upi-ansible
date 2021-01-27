@@ -54,3 +54,4 @@
       # Security groups names
       os_net2_sg_worker: "{{ infraID }}-net2-worker"
       os_net2_sg_ingress: "{{ infraID }}-net2-ingress"
+    when: net2 | default(false) | bool

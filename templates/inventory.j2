@@ -9,7 +9,7 @@ all:
       os_flavor_controlplane: 'ocp.m1.medium'
       os_flavor_worker: 'ocp.m1.medium'
       os_image_rhcos: "{{ rhcosImage }}"
-
+{% if net2 %}
       # Net2 values - gonna need a conditional to allow non-Net2...
       os_net2_subnet_range: "{{ net2OspSubnet }}"
       os_net2_external_network: "{{ net2ExternalNetwork }}"
@@ -17,7 +17,7 @@ all:
       os_net2_ingressVIP: {% raw %}"{{ os_net2_subnet_range | next_nth_usable(7) }}"{% endraw %}
 
       os_net2_pri_net_router_ip: {% raw %}"{{ os_net2_subnet_range | ipaddr('last_usable') }}"{% endraw %}
-
+{% endif %}
       # Service subnet cidr
       svc_subnet_range: '172.30.0.0/16'
       os_svc_network_range: '172.30.0.0/15'

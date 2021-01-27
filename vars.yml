@@ -14,7 +14,7 @@ sshAllowedSources: <Add office IP, VPN IPs and internal network range in list fo
 neustarUltraDnsUsername: "username"
 neustarUltraDnsPassword: "password"
 
-net2: <boolean>
+net2: False
 net2OspSubnet: <Subnet for net2 machines>
 net2ExternalNetwork: <External Network net2>
 net2IngressFIP: <FIP for net2 ingress>
@@ -27,3 +27,19 @@ net2IngressAllowedSources: ["0.0.0.0/0"]
 # - API endpoint of OpenStack cloud
 # (if necessary, automatic routes are added for DNS if externalDNSisNet2 is False)
 net2RoutesViaPriNetwork: ["1.2.3.4/32", "5.6.7.8/32"]
+
+# Disconnected install (usually needed for net2...)
+# NOTE: 
+# - if disconnected, the openshift-install in the path needs to be custom for the specific 
+#   disconnected registry referenced in the imageContentSources block
+# - the entire imageContentSources: string should be between the double-quotes for installConfigExtraParams
+# - unless the private registry allows anonymous pull then the pull-secret.txt file should include an auth
+#   entry for it
+disconnectedInstall: False
+installConfigExtraParams: "imageContentSources:
+- mirrors:
+  - privateregistry.example.com/disconnectedpath
+  source: quay.io/openshift-release-dev/ocp-release
+- mirrors:
+  - privateregistry.example.com/disconnectedpath
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev"

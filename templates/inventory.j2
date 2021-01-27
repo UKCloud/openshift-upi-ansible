@@ -10,7 +10,7 @@ all:
       os_flavor_worker: 'ocp.m1.medium'
       os_image_rhcos: "{{ rhcosImage }}"
 {% if net2 %}
-      # Net2 values - gonna need a conditional to allow non-Net2...
+      # Net2 values
       os_net2_subnet_range: "{{ net2OspSubnet }}"
       os_net2_external_network: "{{ net2ExternalNetwork }}"
       os_net2_ingress_fip: "{{ net2IngressFIP }}"

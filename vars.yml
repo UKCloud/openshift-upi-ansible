@@ -32,14 +32,15 @@ net2RoutesViaPriNetwork: ["1.2.3.4/32", "5.6.7.8/32"]
 # NOTE: 
 # - if disconnected, the openshift-install in the path needs to be custom for the specific 
 #   disconnected registry referenced in the imageContentSources block
-# - the entire imageContentSources: string should be between the double-quotes for installConfigExtraParams
+# - the entire imageContentSources: string should be indented by 2 space under the | as show in the example
 # - unless the private registry allows anonymous pull then the pull-secret.txt file should include an auth
 #   entry for it
 disconnectedInstall: False
-installConfigExtraParams: "imageContentSources:
-- mirrors:
-  - privateregistry.example.com/disconnectedpath
-  source: quay.io/openshift-release-dev/ocp-release
-- mirrors:
-  - privateregistry.example.com/disconnectedpath
-  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev"
+installConfigExtraParams: |
+  imageContentSources:
+  - mirrors:
+    - privateregistry.example.com/disconnectedpath
+    source: quay.io/openshift-release-dev/ocp-release
+  - mirrors:
+    - privateregistry.example.com/disconnectedpath
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev

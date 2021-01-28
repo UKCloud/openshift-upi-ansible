@@ -30,7 +30,7 @@ net2IngressFIP: <FIP for net2 ingress>
 net2IngressAllowedSources: ["0.0.0.0/0"]
 
 # A list of destinations that will be routed back towards the Primary Cluster network router.
-# These are implemented as neutron routes on the Net2 subnet
+# These are implemented as neutron host routes on the Net2 subnet
 # Should include:
 # - IP of disconnected installation registry (plus any ECS/S3 endpoint IP it uses)
 # - IP of API endpoint of OpenStack cloud

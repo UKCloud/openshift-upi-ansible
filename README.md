@@ -29,7 +29,7 @@ ansible-playbook -e @vars.yml -i ./inventory.yaml ./down-server-groups.yaml
 ansible-playbook -i ./inventory.yaml ./down-security-groups.yaml
 ```
 
-## Destroying state in directory to prepare for a fresh test install (for testing only!):
+## Destroying state in directory to prepare for a fresh test install (at your own risk - for testing only!):
 ```
 rm *.ign; rm *.json; rm -rf ./auth; rm inventory.yaml; rm openshift_ke*
 ```

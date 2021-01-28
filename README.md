@@ -1,12 +1,11 @@
 # openshift-upi-ansible
 OpenShift Ansible playbooks to provision infrastructure on a cloud platform
 
-To generate ignition config and manifests necessary to run the deployment ansible playbooks fill out vars.yml and then run:
+To run deployment fill out `vars.yml` and `files/pull-secret.txt`, and then run:
 
-ansible-playbook -e @vars.yml manifests.yaml
+`./deploy.sh`
 
-The rhcos image, clouds.yaml, pull-secret and ssh key are not currently part of the code and need to be created/downloaded manually.
-
+The rhcos image, floating IP creation, pull-secret and ssh key are not currently part of the code and need to be created/downloaded manually, and then referenced in `vars.yml`
 
 
 

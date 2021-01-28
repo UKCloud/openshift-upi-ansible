@@ -3,8 +3,8 @@ externalNetwork: <Network cluster is on (NAME)>
 apiFIP: <FIP for controlplane (IPaddr)>
 ingressFIP: <FIP for dataplane (IPaddr)>
 bootstrapFIP: <FIP for bootstrap access (IPaddr)>
-custID: <Estate API ID for cluster>
-baseDomain: <Base domain for OSP region>
+custID: <Estate API ID for cluster (string)>
+baseDomain: <Base domain for OSP region (string)>
 rhcosImage: <rhcos image present in OSP project (NAME)>
 externalDNS: <List of 2 DNS servers (List of IPaddr)> 
 apiAllowedSources: ["0.0.0.0/0"]
@@ -36,7 +36,7 @@ net2IngressAllowedSources: ["0.0.0.0/0"]
 # - IP of API endpoint of OpenStack cloud
 # (Routes for DNS servers do not need to be specified here; they are added automatically)
 # (Routes for comms to primary ospSubnet are also added automatically)
-net2RoutesViaPriNetwork: ["1.2.3.4/32", "5.6.7.8/32"]
+net2RoutesViaPriNetwork: <List of dests to route (List of CIDR)>
 
 # Disconnected install (usually needed for net2...)
 # - if disconnected, the openshift-install in the path needs to be custom for the specific 

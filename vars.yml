@@ -1,36 +1,36 @@
-ospSubnet: <Subnet for machines>
-externalNetwork: <Network cluster is on>
-apiFIP: <FIP for controlplane>
-ingressFIP: <FIP for dataplane>
-bootstrapFIP: <FIP for bootstrap access>
+ospSubnet: <Subnet for machines (CIDR)>
+externalNetwork: <Network cluster is on (NAME)>
+apiFIP: <FIP for controlplane (IPaddr)>
+ingressFIP: <FIP for dataplane (IPaddr)>
+bootstrapFIP: <FIP for bootstrap access (IPaddr)>
 custID: <Estate API ID for cluster>
 baseDomain: <Base domain for OSP region>
-rhcosImage: <rhcos image present in OSP project>
-externalDNS: <List of 2 DNS servers> 
+rhcosImage: <rhcos image present in OSP project (NAME)>
+externalDNS: <List of 2 DNS servers (List of IPaddr)> 
 apiAllowedSources: ["0.0.0.0/0"]
 ingressAllowedSources: ["0.0.0.0/0"]
-sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format>
+sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format (List of CIDR)>
 neustarUltraDnsUsername: "username"
 neustarUltraDnsPassword: "password"
 
-# Net2 implements a second subnet for Net2 workers
-#  - it requires v4.7+ and (unless the net2 network has Internet access) it needs disconnected install
+# Net2 implements a second subnet for Net2 workers.
+#  - it requires v4.7+ and (unless the net2 network has Internet access) it needs disconnected install.
 #  - Net2 playbooks do not support Kuryr...
 #  - Currently, the whole cluster needs to use the same DNS servers (because dns daemonset in
-#    openshift-dns is installed on all nodes and the svc round-robins between them
+#    openshift-dns is installed on all nodes and the svc round-robins between them.
 #  - The cluster needs to be able to resolve its own external name (for oauth etc) and its OpenStack cloud API
-#    via the specified externalDNS
-#  - externalDNSisOnNet2 defines whether the externalDNS servers are accessed via Net2 (when set to True)
+#    via the specified externalDNS.
+#  - "externalDNSisOnNet2" defines whether the externalDNS servers are accessed via Net2 (when set to True)
 #    or via the primary network (when set to False) - this applies to nodes on both networks!
 net2: False
 externalDNSisOnNet2: False 
-net2OspSubnet: <Subnet for net2 machines>
-net2ExternalNetwork: <External Network net2>
-net2IngressFIP: <FIP for net2 ingress>
+net2OspSubnet: <Subnet for net2 machines (CIDR)>
+net2ExternalNetwork: <External Network net2 (NAME)>
+net2IngressFIP: <FIP for net2 ingress (IPaddr)>
 net2IngressAllowedSources: ["0.0.0.0/0"]
 
 # A list of destinations that will be routed back towards the Primary Cluster network router.
-# These are implemented as neutron host routes on the Net2 subnet
+# These are implemented as neutron host routes on the Net2 subnet.
 # Should include:
 # - IP of disconnected installation registry (plus any ECS/S3 endpoint IP it uses)
 # - IP of API endpoint of OpenStack cloud
@@ -40,10 +40,10 @@ net2RoutesViaPriNetwork: ["1.2.3.4/32", "5.6.7.8/32"]
 
 # Disconnected install (usually needed for net2...)
 # - if disconnected, the openshift-install in the path needs to be custom for the specific 
-#   disconnected registry referenced in the imageContentSources block
-# - the entire imageContentSources: string should be indented by 2 spaces under the | as show in the example
+#   disconnected registry referenced in the imageContentSources block.
+# - the entire imageContentSources: string should be indented by 2 spaces under the | as show in the example.
 # - unless the private registry allows anonymous pull, the pull-secret.txt file should include an auth
-#   entry for the private registry
+#   entry for the private registry.
 disconnectedInstall: False
 installConfigExtraParams: |
   imageContentSources:

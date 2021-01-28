@@ -19,7 +19,7 @@ oc delete MachineSets --all -n openshift-machine-api
 sleep 60
 # Default IC never dies ...
 oc scale IngressControllers default --replicas=0 -n openshift-ingress-operator
-# Wait for workers/infra/net2 to vanish
+# Wait for workers/infra/net2 to vanish - last worker takes ages...
 watch -n5 oc get nodes
 
 ansible-playbook -i ./inventory.yaml ./down-compute-nodes.yaml

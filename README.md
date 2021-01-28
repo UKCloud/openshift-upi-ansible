@@ -11,7 +11,7 @@ The rhcos image, clouds.yaml, pull-secret and ssh key are not currently part of 
 
 
 
-## Rough method for destroying cluster (for quick testing ONLY)
+## Rough method for destroying cluster (for testing ONLY)
 ```
 oc delete IngressControllers --all -n openshift-ingress-operator      
 sleep 10
@@ -27,4 +27,9 @@ ansible-playbook -i ./inventory.yaml ./down-bastion.yaml
 ansible-playbook -e @vars.yml -i ./inventory.yaml ./down-network.yaml
 ansible-playbook -e @vars.yml -i ./inventory.yaml ./down-server-groups.yaml
 ansible-playbook -i ./inventory.yaml ./down-security-groups.yaml
+```
+
+## Destroying state in directory to prepare for a fresh test install (for testing only!):
+```
+rm *.ign; rm *.json; rm -rf ./auth; rm inventory.yaml; rm openshift_ke*
 ```

@@ -6,6 +6,7 @@
 # netaddr
 
 - import_playbook: common.yaml
+- import_playbook: net2-common.yaml
 
 - hosts: all
   gather_facts: no

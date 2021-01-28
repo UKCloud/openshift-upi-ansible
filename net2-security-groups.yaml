@@ -10,6 +10,7 @@
 # and work out which ports all the workers need to talk to each other on (such as mDNS and VXLAN) and remove unnecessary rules)
 
 - import_playbook: common.yaml
+- import_playbook: net2-common.yaml
 
 - hosts: all
   gather_facts: no

@@ -16,10 +16,12 @@ The rhcos image, clouds.yaml, pull-secret and ssh key are not currently part of 
 oc delete IngressControllers --all -n openshift-ingress-operator      
 sleep 10
 oc delete MachineSets --all -n openshift-machine-api
-sleep 20
+sleep 60
 # Default IC never dies ...
 oc scale IngressControllers default --replicas=0 -n openshift-ingress-operator
-sleep 120     
+# Wait for workers/infra/net2 to vanish
+watch -n5 oc get nodes
+
 ansible-playbook -i ./inventory.yaml ./down-compute-nodes.yaml
 ansible-playbook -i ./inventory.yaml ./down-control-plane.yaml
 ansible-playbook -i ./inventory.yaml ./down-bootstrap.yaml

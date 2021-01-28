@@ -15,10 +15,13 @@ neustarUltraDnsPassword: "password"
 
 # Net2 implements a second subnet for Net2 workers
 #  - it requires v4.7+ and (unless the net2 network has Internet access) it needs disconnected install
+#  - Net2 playbooks do not support Kuryr...
 #  - Currently, the whole cluster needs to use the same DNS servers (because dns daemonset in
 #    openshift-dns is installed on all nodes and the svc round-robins between them
-#  - externalDNSisOnNet2 defines whether the DNS servers are accessed via Net2 (by the whole cluster)
-#    or via the primary network
+#  - The cluster needs to be able to resolve its own external name (for oauth etc) and its OpenStack cloud API
+#    via the specified externalDNS
+#  - externalDNSisOnNet2 defines whether the externalDNS servers are accessed via Net2 (when set to True)
+#    or via the primary network (when set to False) - this applies to nodes on both networks!
 net2: False
 externalDNSisOnNet2: False 
 net2OspSubnet: <Subnet for net2 machines>
@@ -30,7 +33,7 @@ net2IngressAllowedSources: ["0.0.0.0/0"]
 # These are implemented as neutron routes on the Net2 subnet
 # Should include:
 # - IP of disconnected installation registry (plus any ECS/S3 endpoint IP it uses)
-# - API endpoint of OpenStack cloud
+# - IP of API endpoint of OpenStack cloud
 # (Routes for DNS servers do not need to be specified here; they are added automatically)
 # (Routes for comms to primary ospSubnet are also added automatically)
 net2RoutesViaPriNetwork: ["1.2.3.4/32", "5.6.7.8/32"]
@@ -38,9 +41,9 @@ net2RoutesViaPriNetwork: ["1.2.3.4/32", "5.6.7.8/32"]
 # Disconnected install (usually needed for net2...)
 # - if disconnected, the openshift-install in the path needs to be custom for the specific 
 #   disconnected registry referenced in the imageContentSources block
-# - the entire imageContentSources: string should be indented by 2 space under the | as show in the example
-# - unless the private registry allows anonymous pull then the pull-secret.txt file should include an auth
-#   entry for it
+# - the entire imageContentSources: string should be indented by 2 spaces under the | as show in the example
+# - unless the private registry allows anonymous pull, the pull-secret.txt file should include an auth
+#   entry for the private registry
 disconnectedInstall: False
 installConfigExtraParams: |
   imageContentSources:

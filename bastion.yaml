@@ -22,6 +22,10 @@
       security_groups:
       - "{{ os_sg_ssh }}"
 
+  - name: 'Set tag on the bastion port'
+    command:
+      cmd: "openstack port set --tag {{ cluster_id_tag }} {{ infrastructureID.stdout }}-bastion-port"
+
   - name: Create bastion server
     os_server:
       name: "{{ infrastructureID.stdout }}-bastion"

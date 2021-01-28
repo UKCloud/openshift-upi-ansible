@@ -34,7 +34,7 @@ net2IngressAllowedSources: ["0.0.0.0/0"]
 # Should include:
 # - IP of disconnected installation registry (plus any ECS/S3 endpoint IP it uses)
 # - IP of API endpoint of OpenStack cloud
-# (Routes for DNS servers do not need to be specified here; they are added automatically)
+# (Routes for DNS servers do not need to be specified here; they are added automatically where appropriate)
 # (Routes for comms to primary ospSubnet are also added automatically)
 net2RoutesViaPriNetwork: <List of dests to route (List of CIDR)>
 

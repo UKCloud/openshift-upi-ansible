@@ -26,13 +26,13 @@
   - name: Find/replace MachineSet, server and security group name
     replace:
         path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml    
-        regexp: "{{ infraID }}-worker"
-        replace: "{{ infraID }}-net2-worker"
+        regexp: "-worker"
+        replace: "-net2-worker"
 
   - name: Find/replace subnet name
     replace:
         path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
-        regexp: "{{ infraID }}-nodes"
-        replace: "{{ infraID }}-net2-nodes"
+        regexp: "-nodes"
+        replace: "-net2-nodes"
 
 

@@ -1,0 +1,41 @@
+- import_playbook: common.yaml
+- import_playbook: net2_common.yaml
+
+- hosts: localhost
+  tasks:
+  - name: Copy worker machineset file for net2
+    copy:
+      src: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
+      dest: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
+
+  - name: Set net2 worker server groups
+    lineinfile:
+      path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
+      insertafter: '^\s{10}image.*$'
+      line: '          serverGroupID: {{ workerNet2Group.id }}'
+
+  - name: Add label for net2 node selector
+    replace:
+      path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
+      regexp: '^\s{6}metadata:.*'
+      replace: '      metadata:\n        labels:\n          node-role.kubernetes.io/net2: ""'
+
+  - name: Set net2 worker scale to 2
+    replace:
+      path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
+      regexp: '^\s{2}replicas: 0$'
+      replace: '  replicas: 2'
+
+  - name: Find/replace MachineSet, server and security group name
+    replace:
+        path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml    
+        regexp: "{{ infraID }}-worker"
+        replace: "{{ infraID }}-net2-worker"
+
+  - name: Find/replace subnet name
+    replace:
+        path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
+        regexp: "{{ os_subnet }}"
+        replace: "{{ os_net2_subnet }}"
+
+

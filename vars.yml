@@ -38,6 +38,25 @@ net2IngressAllowedSources: ["0.0.0.0/0"]
 # (Routes for comms to primary ospSubnet are also added automatically)
 net2RoutesViaPriNetwork: <List of dests to route (List of CIDR)>
 
+# A list of destinations that the primary network can access via the Net2 network
+# This is mostly to enable a cluster whose primary network is NOT Internet, allowing
+# an API on a non-internet network
+# If Internet is the Net2, it may be necessary to include:
+# - IP of disconnected installation registry (plus any ECS/S3 endpoint IP it uses)
+# - IP of API endpoint of OpenStack cloud
+net2RoutesViaNet2Network: []   # Proposed feature, not implemented
+
+# Extra Gateway - additional network connection and ingress on the primary network
+# If egIngressFIP is set to "", no Ingress will be created.
+extraGateway: False
+egIsOnNet2: False   # Proposed feature, not implemented
+egExternalNetwork: <External Network Extra Gateway (NAME)>
+egIngressFIP: <FIP for EG ingress (IPaddr)>
+egIngressAllowedSources: ["0.0.0.0/0"]
+egRoutes: <List of dests to route via Extra Gateway  (List of CIDR)>
+# If Net2 is also enabled, should EG outbound access be possible from Net2 workers?
+egAccessFromNet2: False   # Proposed feature, not implemented
+
 # Disconnected install (usually needed for net2...)
 # - if disconnected, the openshift-install in the path needs to be custom for the specific 
 #   disconnected registry referenced in the imageContentSources block.

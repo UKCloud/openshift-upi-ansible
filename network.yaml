@@ -25,7 +25,7 @@
       network_name: "{{ os_network }}"
       cidr: "{{ os_subnet_range }}"
       allocation_pool_start: "{{ os_subnet_range | next_nth_usable(10) }}"
-      allocation_pool_end: "{{ os_subnet_range | ipaddr('last_usable') }}"
+      allocation_pool_end: "{{ os_subnet_range | ipaddr('last_usable') | ipmath(-1) }}"
 
   - name: 'Set tags on  primary cluster subnet'
     command:

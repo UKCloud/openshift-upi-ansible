@@ -107,5 +107,3 @@
     command: openstack subnet set --host-route "destination={{ item }},gateway={{ os_net2_pri_net_router_ip }}"  "{{ os_net2_subnet }}"
     loop: "{{ net2RoutesViaPriNetwork }}"
 
-
-

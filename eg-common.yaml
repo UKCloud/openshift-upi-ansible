@@ -1,0 +1,15 @@
+- hosts: localhost
+  gather_facts: no
+
+  vars_files:
+  - metadata.json
+
+  tasks:
+  - name: 'Extra gateway resource names'
+    set_fact:
+      os_eg_router: "{{ infraID }}-eg-external-router"
+      # Port names
+      os_eg_port_ingress: "{{ infraID }}-eg-ingress-port"     
+      # Security groups names
+      os_eg_sg_ingress: "{{ infraID }}-eg-ingress"
+    when: extraGateway | default(false) | bool

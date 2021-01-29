@@ -7,7 +7,12 @@
   when: net2 | default(false) | bool
 - import_playbook: net2-network.yaml
   when: net2 | default(false) | bool
-  
+
+- import_playbook: eg-security-groups.yaml
+  when: extraGateway | default(false) | bool
+- import_playbook: eg-network.yaml
+  when: extraGateway | default(false) | bool
+
 - import_playbook: bootstrap.yaml
 - import_playbook: control-plane.yaml
 

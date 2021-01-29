@@ -1,6 +1,3 @@
-- import_playbook: common.yaml
-- import_playbook: net2_common.yaml
-
 - hosts: localhost
   tasks:
   - name: Copy worker machineset file for net2
@@ -35,7 +32,7 @@
   - name: Find/replace subnet name
     replace:
         path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
-        regexp: "{{ os_subnet }}"
-        replace: "{{ os_net2_subnet }}"
+        regexp: "{{ infraID }}-nodes"
+        replace: "{{ infraID }}-net2-nodes"
 
 

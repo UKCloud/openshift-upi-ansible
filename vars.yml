@@ -2,6 +2,7 @@ custID: <Estate API ID for cluster (string)>
 baseDomain: <Base domain for OSP region (string)>
 rhcosImage: <rhcos image present in OSP project (NAME)>
 externalDNS: <List of exactly 2 DNS servers (List of IPaddr)> 
+initialWorkerCount: 2
 
 # Primary network params
 ospSubnet: <Subnet for machines (CIDR)>
@@ -30,6 +31,7 @@ neustarUltraDnsPassword: "password"
 #    or via the primary network (when set to False) - this applies to nodes on both networks!
 net2: False
 externalDNSisOnNet2: False 
+net2InitialWorkerCount: 2
 net2OspSubnet: <Subnet for net2 machines (CIDR)>
 net2ExternalNetwork: <External Network net2 (NAME)>
 net2IngressFIP: <FIP for net2 ingress (IPaddr)>

@@ -53,11 +53,11 @@
       regexp: '^\s{6}metadata:.*'
       replace: '      metadata:\n        labels:\n          node-role.kubernetes.io/app: ""'      
 
-  - name: Set worker scale to 2
+  - name: Set worker scale
     replace:
       path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
       regexp: '^\s{2}replicas: 0$'
-      replace: '  replicas: 2'
+      replace: '  replicas: {{ initialWorkerCount }}'
 
   - name: Generate ignition configs
     command: openshift-install create ignition-configs --dir=./

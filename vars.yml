@@ -61,7 +61,7 @@ priNetRoutesViaNet2Network: []   # Proposed feature, not implemented
 
 #################################################################################################################
 # Extra Gateway on Primary network - a secondary network connection and ingress on the primary network 
-# Should work fine with v4.6 (when Net2 isn't also enabled)
+# Should work fine with v4.6
 # At this point, siting the cluster ExternalDNS on EG is not supported; routing would be made too complex?
 extraGatewayForPriNet: False
 egExternalNetworkForPriNet: <External Network Extra Gateway (NAME)>

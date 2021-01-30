@@ -26,7 +26,7 @@
       network_name: "{{ os_net2_network }}"
       cidr: "{{ os_net2_subnet_range }}"
       allocation_pool_start: "{{ os_net2_subnet_range | next_nth_usable(10) }}"
-      allocation_pool_end: "{{ os_net2_subnet_range | ipaddr('last_usable') | ipmath(-1) }}"
+      allocation_pool_end: "{{ os_net2_subnet_range | ipaddr('last_usable') | ipmath(-2) }}"
 
   - name: 'Set tags on Net2 subnet'
     command:

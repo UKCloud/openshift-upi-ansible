@@ -1,20 +1,26 @@
+custID: <Estate API ID for cluster (string)>
+baseDomain: <Base domain for OSP region (string)>
+rhcosImage: <rhcos image present in OSP project (NAME)>
+externalDNS: <List of exactly 2 DNS servers (List of IPaddr)> 
+
+# Primary network params
 ospSubnet: <Subnet for machines (CIDR)>
 externalNetwork: <Network cluster is on (NAME)>
 apiFIP: <FIP for controlplane (IPaddr)>
 ingressFIP: <FIP for dataplane (IPaddr)>
 bootstrapFIP: <FIP for bootstrap access (IPaddr)>
-custID: <Estate API ID for cluster (string)>
-baseDomain: <Base domain for OSP region (string)>
-rhcosImage: <rhcos image present in OSP project (NAME)>
-externalDNS: <List of 2 DNS servers (List of IPaddr)> 
 apiAllowedSources: ["0.0.0.0/0"]
 ingressAllowedSources: ["0.0.0.0/0"]
 sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format (List of CIDR)>
+
+# Neustar account to allow DNS records to be created
 neustarUltraDnsUsername: "username"
 neustarUltraDnsPassword: "password"
 
+
+#################################################################################################################
 # Net2 implements a second subnet for Net2 workers.
-#  - it requires v4.7+ and (unless the net2 network has Internet access) it needs disconnected install.
+#  - it requires v4.7+, and (unless the net2 network has full Internet access) it needs disconnected install.
 #  - Net2 playbooks do not support Kuryr...
 #  - Currently, the whole cluster needs to use the same DNS servers (because dns daemonset in
 #    openshift-dns is installed on all nodes and the svc round-robins between them.
@@ -29,7 +35,7 @@ net2ExternalNetwork: <External Network net2 (NAME)>
 net2IngressFIP: <FIP for net2 ingress (IPaddr)>
 net2IngressAllowedSources: ["0.0.0.0/0"]
 
-# A list of destinations that will be routed back towards the Primary Cluster network router.
+# A list of destinations that will be routed form Net2 subnet back towards the Primary Cluster network router.
 # These are implemented as neutron host routes on the Net2 subnet.
 # Should include:
 # - IP of disconnected installation registry (plus any ECS/S3 endpoint IP it uses)
@@ -38,25 +44,44 @@ net2IngressAllowedSources: ["0.0.0.0/0"]
 # (Routes for comms to primary ospSubnet are also added automatically)
 net2RoutesViaPriNetwork: <List of dests to route (List of CIDR)>
 
-# A list of destinations that the primary network can access via the Net2 network
+# A list of destinations that the primary network nodes can access via the Net2 network
 # This is mostly to enable a cluster whose primary network is NOT Internet, allowing
-# an API on a non-internet network
+# the API to be on a non-Internet network (when Internet is Net2)
 # If Internet is the Net2, it may be necessary to include:
 # - IP of disconnected installation registry (plus any ECS/S3 endpoint IP it uses)
 # - IP of API endpoint of OpenStack cloud
+# Special consideration (routing for sshAllowedSources) would need to be implemented to allow
+# SSH admin access from UKC office...
+# Alternatively, this could be used when Internet is Pri network to implement specific customer requirements
+# for all nodes to have access to some Net2 resources.
 net2RoutesViaNet2Network: []   # Proposed feature, not implemented
 
-# Extra Gateway - additional network connection and ingress on the primary network
-# If egIngressFIP is set to "", no Ingress will be created.
-extraGateway: False
-egIsOnNet2: False   # Proposed feature, not implemented
-egExternalNetwork: <External Network Extra Gateway (NAME)>
-egIngressFIP: <FIP for EG ingress (IPaddr)>
-egIngressAllowedSources: ["0.0.0.0/0"]
-egRoutes: <List of dests to route via Extra Gateway  (List of CIDR)>
-# If Net2 is also enabled, should EG outbound access be possible from Net2 workers?
-egAccessFromNet2: False   # Proposed feature, not implemented
 
+#################################################################################################################
+# Extra Gateway - a secondary network connection and ingress on the primary network (or maybe Net2 network?)
+# Should work fine with v4.6 (when Net2 isn't also enabled)
+# If egIngressFIP is set to "", no Ingress will be created and connectivity will be outbound-only
+# At this point, siting the cluster ExternalDNS on EG is not supported; routing would be made too complex?
+extraGateway: False
+egExternalNetwork: <External Network Extra Gateway (NAME)>
+egIngressFIP: <FIP for EG ingress (IPaddr) or "" to disable EG ingress>
+egIngressAllowedSources: ["0.0.0.0/0"]
+
+# Routes for EG that are added on the Primary network nodes via neutron subnet config
+# - if egIsOnNet2 is implemented&enabled, this will likely need router routes too?
+# - if egIsOnNet2 is implemented&enabled, and if EG access is not desired from Pri net, this should be set to []
+egRoutesonPriNetwork: <List of dests to route from Pri network to Extra Gateway  (List of CIDR)>
+
+# If Net2 is also enabled, Routes to be added to Net2 subnet to send towards EG 
+# - will likely need router routes too unless egIsOnNet2 is implemented&enabled
+# - if EG access is not desired from Net2, this should be set to []
+egRoutesonNet2Network: <List of dests to route from Net2 network to Extra Gateway (List of CIDR)>  # Proposed feature, not implemented
+
+# If Net2 is also enabled, Should Extra Gateway be attached to Net2 rather than the primary network? 
+egIsOnNet2: False   # Proposed feature, not implemented
+
+
+#################################################################################################################
 # Disconnected install (usually needed for net2...)
 # - if disconnected, the openshift-install in the path needs to be custom for the specific 
 #   disconnected registry referenced in the imageContentSources block.

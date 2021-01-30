@@ -8,7 +8,7 @@
 - import_playbook: common.yaml
 - import_playbook: eg-common.yaml
 
-  - name: 'Create Extra Gateway external router'
+  - name: 'Create Extra Gateway external router on Primary subnet'
     os_router:
       name: "{{ os_eg_router }}"
       network: "{{ os_eg_external_network }}"
@@ -18,7 +18,7 @@
         portip: "{{ os_subnet_range | ipaddr('last_usable') }}"
     when: os_eg_external_network is defined and os_eg_external_network|length>0
 
-  - name: 'Create the EG Ingress port'
+  - name: 'Create the EG Ingress port on Primary subnet'
     os_port:
       name: "{{ os_eg_port_ingress }}"
       network: "{{ os_network }}"
@@ -41,6 +41,6 @@
       cmd: "openstack floating ip set --port {{ os_eg_port_ingress }} {{ os_eg_ingress_fip }}"
     when: os_eg_ingress_fip is defined and os_eg_ingress_fip|length>0
     
-  - name: 'Set Extra Gateway routes on subnet'
+  - name: 'Set Extra Gateway routes on Primary subnet'
     command: openstack subnet set --host-route "destination={{ item }},gateway={{ os_subnet_range | ipaddr('last_usable') }}"  "{{ os_subnet }}"
-    loop: "{{ egRoutes }}" 
+    loop: "{{ egRoutesonPriNetwork }}" 

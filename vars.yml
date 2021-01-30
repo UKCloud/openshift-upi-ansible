@@ -56,7 +56,7 @@ net2RoutesViaPriNetwork: <List of dests to route (List of CIDR)>
 # SSH admin access from UKC office...
 # Alternatively, this could be used when Internet is Pri network to implement specific customer requirements
 # for all nodes to have access to some Net2 resources.
-net2RoutesViaNet2Network: []   # Proposed feature, not implemented
+priNetRoutesViaNet2Network: []   # Proposed feature, not implemented
 
 
 #################################################################################################################

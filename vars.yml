@@ -60,27 +60,28 @@ net2RoutesViaNet2Network: []   # Proposed feature, not implemented
 
 
 #################################################################################################################
-# Extra Gateway - a secondary network connection and ingress on the primary network (or maybe Net2 network?)
+# Extra Gateway on Primary network - a secondary network connection and ingress on the primary network 
 # Should work fine with v4.6 (when Net2 isn't also enabled)
-# If egIngressFIP is set to "", no Ingress will be created and connectivity will be outbound-only
 # At this point, siting the cluster ExternalDNS on EG is not supported; routing would be made too complex?
-extraGateway: False
-egExternalNetwork: <External Network Extra Gateway (NAME)>
-egIngressFIP: <FIP for EG ingress (IPaddr) or "" to disable EG ingress>
-egIngressAllowedSources: ["0.0.0.0/0"]
+extraGatewayForPriNet: False
+egExternalNetworkForPriNet: <External Network Extra Gateway (NAME)>
+egIngressFIPForPriNet: <FIP for EG ingress (IPaddr) or "" to disable EG ingress>
+egIngressAllowedSourcesForPriNet: ["0.0.0.0/0"]
 
 # Routes for EG that are added on the Primary network nodes via neutron subnet config
-# - if egIsOnNet2 is implemented&enabled, this will likely need router routes too?
-# - if egIsOnNet2 is implemented&enabled, and if EG access is not desired from Pri net, this should be set to []
-egRoutesonPriNetwork: <List of dests to route from Pri network to Extra Gateway  (List of CIDR)>
+egRoutesonPriNetwork: <List of dests to route from Pri network to its Extra Gateway  (List of CIDR)>
 
-# If Net2 is also enabled, Routes to be added to Net2 subnet to send towards EG 
-# - will likely need router routes too unless egIsOnNet2 is implemented&enabled
-# - if EG access is not desired from Net2, this should be set to []
-egRoutesonNet2Network: <List of dests to route from Net2 network to Extra Gateway (List of CIDR)>  # Proposed feature, not implemented
 
-# If Net2 is also enabled, Should Extra Gateway be attached to Net2 rather than the primary network? 
-egIsOnNet2: False   # Proposed feature, not implemented
+# Extra Gateway on Net2 - a secondary network connection and ingress on the Net2 network 
+# Net2 muyst also be enabled
+extraGatewayForNet2: False    # Proposed feature, not implemented
+egExternalNetworkiForNet2: <External Network Extra Gateway (NAME)>
+egIngressFIPForNet2: <FIP for EG ingress (IPaddr) or "" to disable EG ingress>
+egIngressAllowedSourcesForNet2: ["0.0.0.0/0"]
+
+# Routes for EG that are added on the Net2 nodes via neutron subnet config
+egRoutesonNet2Network: <List of dests to route from Net2 network to its Extra Gateway (List of CIDR)>  # Proposed feature, not implemented
+
 
 
 #################################################################################################################

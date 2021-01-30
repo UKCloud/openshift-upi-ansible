@@ -15,7 +15,7 @@
       interfaces:
       - net: "{{ os_network }}"
         subnet: "{{ os_subnet }}"
-        portip: "{{ os_subnet_range | ipaddr('last_usable') }}"
+        portip: "{{ os_subnet_range | ipaddr('last_usable') | ipmath(-1) }}"
     when: os_eg_external_network is defined and os_eg_external_network|length>0
 
   - name: 'Create the EG Ingress port on Primary subnet'

@@ -69,19 +69,19 @@ egIngressFIPForPriNet: <FIP for EG ingress (IPaddr) or "" to disable EG ingress>
 egIngressAllowedSourcesForPriNet: ["0.0.0.0/0"]
 
 # Routes for EG that are added on the Primary network nodes via neutron subnet config
+# Note: these routes must include any client IPs that are to access egIngressFIP from the egExternalNetwork
 egRoutesonPriNetwork: <List of dests to route from Pri network to its Extra Gateway  (List of CIDR)>
 
-
 # Extra Gateway on Net2 - a secondary network connection and ingress on the Net2 network 
-# Net2 muyst also be enabled
+# Net2 must also be enabled
 extraGatewayForNet2: False    # Proposed feature, not implemented
-egExternalNetworkiForNet2: <External Network Extra Gateway (NAME)>
+egExternalNetworkForNet2: <External Network Extra Gateway (NAME)>
 egIngressFIPForNet2: <FIP for EG ingress (IPaddr) or "" to disable EG ingress>
 egIngressAllowedSourcesForNet2: ["0.0.0.0/0"]
 
 # Routes for EG that are added on the Net2 nodes via neutron subnet config
+# Note: these routes must include any client IPs that are to access egIngressFIP from the egExternalNetwork
 egRoutesonNet2Network: <List of dests to route from Net2 network to its Extra Gateway (List of CIDR)>  # Proposed feature, not implemented
-
 
 
 #################################################################################################################

@@ -42,5 +42,5 @@
     when: os_eg_ingress_fip is defined and os_eg_ingress_fip|length>0
     
   - name: 'Set Extra Gateway routes on Primary subnet'
-    command: openstack subnet set --host-route "destination={{ item }},gateway={{ os_subnet_range | ipaddr('last_usable') }}"  "{{ os_subnet }}"
+    command: openstack subnet set --host-route "destination={{ item }},gateway={{ os_subnet_range | ipaddr('last_usable') | ipmath(-1) }}"  "{{ os_subnet }}"
     loop: "{{ egRoutesonPriNetwork }}" 

@@ -15,6 +15,7 @@ all:
       os_net2_external_network: "{{ net2ExternalNetwork }}"
       os_net2_ingress_fip: "{{ net2IngressFIP }}"
       os_net2_ingressVIP: {% raw %}"{{ os_net2_subnet_range | next_nth_usable(7) }}"{% endraw %}
+
       os_net2_pri_net_router_ip: {% raw %}"{{ os_net2_subnet_range | ipaddr('last_usable') }}"{% endraw %}
 {% endif %}
 {% if extraGatewayForPriNet %}

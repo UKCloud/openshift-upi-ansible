@@ -26,7 +26,7 @@ networking:
   - 172.30.0.0/16
 platform:
   openstack:
-    apiVIP: 10.0.0.5
+    apiVIP: {{ os_apiVIP }}
     cloud: openstack
     computeFlavor: ocp.m1.medium
     clusterOSImage: {{ rhcosImage }}
@@ -35,7 +35,7 @@ platform:
     - {{ dnsServer }}
 {% endfor %}
     externalNetwork: internet
-    ingressVIP: 10.0.0.7
+    ingressVIP: {{ os_ingressVIP }}
     lbFloatingIP: {{ apiFIP }}
 publish: External
 pullSecret: '{{ pullSecret }}'

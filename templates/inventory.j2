@@ -24,6 +24,7 @@ all:
       os_eg_external_network: "{{ egExternalNetworkForPriNet }}"
       os_eg_ingress_fip: "{{ egIngressFIPForPriNet }}"
       os_eg_ingressVIP: {% raw %}"{{ os_subnet_range | next_nth_usable(9) }}"{% endraw %}
+
 {% endif %}
 
       # Service subnet cidr

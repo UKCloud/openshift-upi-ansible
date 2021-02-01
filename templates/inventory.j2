@@ -17,12 +17,14 @@ all:
       os_net2_ingressVIP: {% raw %}"{{ os_net2_subnet_range | next_nth_usable(7) }}"{% endraw %}
 
       os_net2_pri_net_router_ip: {% raw %}"{{ os_net2_subnet_range | ipaddr('last_usable') }}"{% endraw %}
+
 {% endif %}
 {% if extraGatewayForPriNet %}
       # Extra Gateway values for Primary network
       os_eg_external_network: "{{ egExternalNetworkForPriNet }}"
       os_eg_ingress_fip: "{{ egIngressFIPForPriNet }}"
       os_eg_ingressVIP: {% raw %}"{{ os_subnet_range | next_nth_usable(9) }}"{% endraw %}
+
 {% endif %}
 
       # Service subnet cidr

@@ -7,6 +7,8 @@
 - import_playbook: common.yaml
 - import_playbook: net2-common.yaml
   when: net2 | default(false) | bool
+- import_playbook: eg-common.yaml
+  when: extraGatewayForPriNet | default(false) | bool
 
 - hosts: all
   gather_facts: no

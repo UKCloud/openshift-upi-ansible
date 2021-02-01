@@ -8,6 +8,10 @@
 - import_playbook: common.yaml
 - import_playbook: eg-common.yaml
 
+- hosts: all
+  gather_facts: no
+
+  tasks:
   - name: 'Create Extra Gateway external router on Primary subnet'
     os_router:
       name: "{{ os_eg_router }}"

@@ -23,7 +23,7 @@
 
   - name: 'Remove all routes from EG router on  Pri net'
     command:
-      cmd: "openstack router set --no-route {{ os_net2_router }}"
+      cmd: "openstack router set --no-route {{ os_eg_router }}"
     when: extraGatewayForPriNet | default(false) | bool
 
   - name: 'List ports attached to routers'

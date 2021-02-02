@@ -1,0 +1,25 @@
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+# netaddr
+
+- import_playbook: common.yaml
+- import_playbook: eg-common.yaml
+- import_playbook: net2-common.yaml  
+
+- hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: 'Set Extra Gateway routes on Net2 subnet, pointing towards Pri network router'
+    command: openstack subnet set --host-route "destination={{ item }},gateway={{ os_net2_pri_net_router_ip }}"  "{{ os_net2_subnet }}"
+    loop: "{{ egRoutesOnNet2Network }}" 
+
+  - name: 'Set routes on Primary router to send traffic onwards to EG router'
+    command: openstack router set --route "destination={{ item }},gateway={{ os_subnet_range | ipaddr('last_usable') | ipmath(-1) }}"  "{{ os_router }}"
+    loop: "{{ egRoutesOnNet2Network }}"
+
+  - name: 'Set a return route for the Net2 subnet on the EG router'
+    command: openstack router set --route "destination={{ os_net2_subnet_range }},gateway={{ os_subnet_range | next_nth_usable(1) }}"  "{{ os_eg_router }}"

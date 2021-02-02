@@ -13,6 +13,11 @@
 - import_playbook: eg-network.yaml
   when: extraGateway | default(false) | bool
 
+- import_playbook: eg-net2-routes.yaml 
+  when: 
+    - net2 | default(false) | bool
+    - extraGateway | default(false) | bool
+
 - import_playbook: bootstrap.yaml
 - import_playbook: control-plane.yaml
 

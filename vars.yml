@@ -70,7 +70,14 @@ egIngressAllowedSources: ["0.0.0.0/0"]
 
 # Routes for EG that are added on the Primary network nodes via neutron subnet config
 # Note: these routes must include any client IPs that are to access egIngressFIP from the egExternalNetwork
-egRoutes: <List of dests to route from Pri network to its Extra Gateway  (List of CIDR)>
+egRoutesOnPriNetwork: <List of dests to route from Pri network to its Extra Gateway  (List of CIDR)>
+
+# List of destinations on EG that should be accessible from Net2 network, via routes which are added automatically 
+# as follows (possibly identical to egRoutesOnPriNetwork if that is the requirement):
+# - Routes added to Net2 subnet to send traffic to Pri router
+# - Routes on the Pri router to send these dests toward the EG router
+# - A return route for the whole Net2 subnet on the EG router, sending replies back to the Pri router 
+egRoutesOnNet2Network: []    # Proposed feature, not implemented
 
 
 #################################################################################################################

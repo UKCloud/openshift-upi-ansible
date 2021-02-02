@@ -8,7 +8,7 @@
 - import_playbook: net2-common.yaml
   when: net2 | default(false) | bool
 - import_playbook: eg-common.yaml
-  when: extraGatewayForPriNet | default(false) | bool
+  when: extraGateway | default(false) | bool
 
 - hosts: all
   gather_facts: no
@@ -26,7 +26,7 @@
   - name: 'Remove all routes from EG router on  Pri net'
     command:
       cmd: "openstack router set --no-route {{ os_eg_router }}"
-    when: extraGatewayForPriNet | default(false) | bool
+    when: extraGateway | default(false) | bool
 
   - name: 'List ports attached to routers'
     command:
@@ -48,7 +48,7 @@
     command:
       cmd: "openstack router remove port {{ os_eg_router }} {{ item.1}}"
     with_indexed_items: "{{ router_ports.stdout_lines }}"
-    when: extraGatewayForPriNet | default(false) | bool
+    when: extraGateway | default(false) | bool
 
   - name: 'List ha ports attached to router'
     command:
@@ -70,7 +70,7 @@
     command:
       cmd: "openstack router remove port {{ os_eg_router }} {{ item.1}}"
     with_indexed_items: "{{ ha_router_ports.stdout_lines }}"
-    when: extraGatewayForPriNet | default(false) | bool
+    when: extraGateway | default(false) | bool
 
   - name: 'List ports'
     command:
@@ -97,7 +97,7 @@
     os_router:
       name: "{{ os_eg_router }}"
       state: absent
-    when: extraGatewayForPriNet | default(false) | bool
+    when: extraGateway | default(false) | bool
 
   - name: 'List cluster networks'
     command:

@@ -9,9 +9,9 @@
   when: net2 | default(false) | bool
 
 - import_playbook: eg-security-groups.yaml
-  when: extraGatewayForPriNet | default(false) | bool
+  when: extraGateway | default(false) | bool
 - import_playbook: eg-network.yaml
-  when: extraGatewayForPriNet | default(false) | bool
+  when: extraGateway | default(false) | bool
 
 - import_playbook: bootstrap.yaml
 - import_playbook: control-plane.yaml

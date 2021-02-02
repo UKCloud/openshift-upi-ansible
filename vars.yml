@@ -63,25 +63,14 @@ priNetRoutesViaNet2Network: []   # Proposed feature, not implemented
 # Extra Gateway on Primary network - a secondary network connection and ingress on the primary network 
 # Should work fine with v4.6
 # At this point, siting the cluster ExternalDNS on EG is not supported; routing would be made too complex?
-extraGatewayForPriNet: False
-egExternalNetworkForPriNet: <External Network Extra Gateway (NAME)>
-egIngressFIPForPriNet: <FIP for EG ingress (IPaddr) or "" to disable EG ingress>
-egIngressAllowedSourcesForPriNet: ["0.0.0.0/0"]
+extraGateway: False
+egExternalNetwork: <External Network Extra Gateway (NAME)>
+egIngressFIP: <FIP for EG ingress (IPaddr) or "" to disable EG ingress>
+egIngressAllowedSources: ["0.0.0.0/0"]
 
 # Routes for EG that are added on the Primary network nodes via neutron subnet config
 # Note: these routes must include any client IPs that are to access egIngressFIP from the egExternalNetwork
-egRoutesonPriNetwork: <List of dests to route from Pri network to its Extra Gateway  (List of CIDR)>
-
-# Extra Gateway on Net2 - a secondary network connection and ingress on the Net2 network 
-# Net2 must also be enabled
-extraGatewayForNet2: False    # Proposed feature, not implemented
-egExternalNetworkForNet2: <External Network Extra Gateway (NAME)>
-egIngressFIPForNet2: <FIP for EG ingress (IPaddr) or "" to disable EG ingress>
-egIngressAllowedSourcesForNet2: ["0.0.0.0/0"]
-
-# Routes for EG that are added on the Net2 nodes via neutron subnet config
-# Note: these routes must include any client IPs that are to access egIngressFIP from the egExternalNetwork
-egRoutesonNet2Network: <List of dests to route from Net2 network to its Extra Gateway (List of CIDR)>  # Proposed feature, not implemented
+egRoutes: <List of dests to route from Pri network to its Extra Gateway  (List of CIDR)>
 
 
 #################################################################################################################

@@ -12,4 +12,4 @@
       os_eg_port_ingress: "{{ infraID }}-eg-ingress-port"     
       # Security groups names
       os_eg_sg_ingress: "{{ infraID }}-eg-ingress"
-    when: extraGatewayForPriNet | default(false) | bool
+    when: extraGateway | default(false) | bool

@@ -1,7 +1,7 @@
 # Suggested template which splits the openshift-openstack-infra keepalived using MC and makes an IngressController
 # Needs: 
 # - the actual keepalived.conf.tmpl contents to be sanity checked
-# - the default IngressController needs a negative namespaceSelector added to it so that doesn't pick up net2 routers
+# - the default IngressController needs a negative namespaceSelector added to it so that doesn't pick up net2 routes
 #   or a positive namespaceSelector that makes it only pick up routes for namespaces with label "network: internet", maybe adding
 #   another label in both IG's namespaceSelector's "network: both" ????
 # EG Ingress could be made simlarly but we would need to work out what nodes to site it on...

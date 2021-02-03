@@ -43,7 +43,7 @@ metadata:
   name: net2
   namespace: openshift-ingress-operator
 spec:
-  domain: net2.7969-278091.cor00005-2.cna.ukcloud.com
+  domain: net2.{{ custID }}.{{ baseDomain }}
   namespaceSelector:
     matchLabels:
       network: net2

@@ -4,6 +4,9 @@ rhcosImage: <rhcos image present in OSP project (NAME)>
 externalDNS: <List of exactly 2 DNS servers (List of IPaddr)> 
 initialWorkerCount: 2
 
+# OpenShift SDN network ranges can be altered using osClusterNetwork and osServiceNetwork parameters 
+# for complex network situations but usually don't need to be specifed
+
 # Primary network params
 ospSubnet: <Subnet for machines (CIDR)>
 externalNetwork: <Network cluster is on (NAME)>

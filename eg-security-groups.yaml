@@ -31,7 +31,7 @@
     loop: "{{ egIngressAllowedSources }}"
     when: os_eg_ingress_fip is defined and os_eg_ingress_fip|length>0    
 
-  - name: 'Create eg-ingress-sg rule "Extra Gateway Igress HTTPS external"'
+  - name: 'Create eg-ingress-sg rule "Extra Gateway Ingress HTTPS external"'
     os_security_group_rule:
       security_group: "{{ os_eg_sg_ingress }}"
       remote_ip_prefix: "{{ item }}"

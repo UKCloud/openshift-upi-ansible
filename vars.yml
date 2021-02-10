@@ -47,7 +47,7 @@ net2IngressAllowedSources: ["0.0.0.0/0"]
 # - IP of API endpoint of OpenStack cloud
 # (Routes for DNS servers do not need to be specified here; they are added automatically where appropriate)
 # (Routes for comms to controlplane on primary ospSubnet are also added automatically)
-net2RoutesViaPriNetwork: <List of dests to route (List of CIDR)>
+net2RoutesViaPriNetwork: [] # <List of dests to route (List of CIDR)>
 
 # A list of destinations that the primary network nodes can access via the Net2 network.
 # This is mostly to enable a cluster whose primary network is NOT Internet, allowing

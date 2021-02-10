@@ -25,6 +25,8 @@ ansible-playbook -i ./inventory.yaml ./down-compute-nodes.yaml
 ansible-playbook -i ./inventory.yaml ./down-control-plane.yaml
 ansible-playbook -i ./inventory.yaml ./down-bootstrap.yaml
 ansible-playbook -i ./inventory.yaml ./down-bastion.yaml
+# The down-network playbook needs to be run twice due to ha_router port removal occasionally failing
+ansible-playbook -e @vars.yml -i ./inventory.yaml ./down-network.yaml
 ansible-playbook -e @vars.yml -i ./inventory.yaml ./down-network.yaml
 ansible-playbook -e @vars.yml -i ./inventory.yaml ./down-server-groups.yaml
 ansible-playbook -i ./inventory.yaml ./down-security-groups.yaml

@@ -1,3 +1,5 @@
+#!/bin/sh
+
 set -xe
 
 ssh-keygen -t rsa -b 4096 -N '' -f openshift_key

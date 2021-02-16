@@ -46,7 +46,7 @@
 
   - name: 'Create port for primary router on net2 network'
     os_port:
-      name: "pri_router_port"
+      name: "{{ os_net2_port_pri_router }}"
       state: present
       network: "{{ os_net2_network }}"
       fixed_ips: 
@@ -54,11 +54,11 @@
 
   - name: 'Set tag on the new port'
     command:
-      cmd: "openstack port set --tag {{ cluster_id_tag }} pri_router_port"
+      cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_net2_port_pri_router }}"
 
     # os_router module appears unwilling to update existing router to add interface so cmd...    
   - name: 'Connect port to primary router to give access to/from the net2 network'
-    command: openstack router add port "{{ os_router }}" "pri_router_port"
+    command: openstack router add port "{{ os_router }}" "{{ os_net2_port_pri_router }}"
 
     # If we access DNS via the Primary network:
   - name: 'Set host route on Net2 subnet to allow access to DNS via primary network'

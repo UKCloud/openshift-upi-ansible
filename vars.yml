@@ -1,14 +1,103 @@
-ospSubnet: <Subnet for machines>
-externalNetwork: <Network cluster is on>
-apiFIP: <FIP for controlplane>
-ingressFIP: <FIP for dataplane>
-bootstrapFIP: <FIP for bootstrap access>
-custID: <Estate API ID for cluster>
-baseDomain: <Base domain for OSP region>
-rhcosImage: <rhcos image present in OSP project>
-externalDNS: <List of 2 DNS servers>
+custID: <Estate API ID for cluster (string)>
+baseDomain: <Base domain for OSP region (string)>
+rhcosImage: <rhcos image present in OSP project (NAME)>
+externalDNS: <List of exactly 2 DNS servers (List of IPaddr)> 
+initialWorkerCount: 2
+
+# Primary network params
+ospSubnet: <Subnet for machines (CIDR)>
+externalNetwork: <Network cluster is on (NAME)>
+apiFIP: <FIP for controlplane (IPaddr)>
+ingressFIP: <FIP for dataplane (IPaddr)>
+bootstrapFIP: <FIP for bootstrap access (IPaddr)>
 apiAllowedSources: ["0.0.0.0/0"]
 ingressAllowedSources: ["0.0.0.0/0"]
-sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format>
+sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format (List of CIDR)>
+
+# Neustar account to allow DNS records to be created
 neustarUltraDnsUsername: "username"
 neustarUltraDnsPassword: "password"
+
+# Default OpenShift SDN network ranges can be altered by adding osClusterNetwork and osServiceNetwork parameters 
+#  for complex network situations but these usually don't need to be specifed.
+
+
+#################################################################################################################
+# Net2 implements a second subnet for Net2 workers.
+#  - Net2 requires v4.7+, and (unless the net2 network has full Internet access) it needs disconnected install.
+#  - Net2 playbooks do not support Kuryr...
+#  - Currently, the whole cluster needs to use the same DNS servers (because dns daemonset in
+#    openshift-dns is installed on all nodes and the svc round-robins between them.
+#  - The cluster needs to be able to resolve its own external name (for oauth etc) and its OpenStack cloud API
+#    via the specified externalDNS.
+#  - "externalDNSisOnNet2" defines whether the externalDNS servers are accessed via Net2 (when set to True)
+#    or via the primary network (when set to False).
+net2: False
+externalDNSisOnNet2: False 
+net2InitialWorkerCount: 2
+net2OspSubnet: <Subnet for net2 machines (CIDR)>
+net2ExternalNetwork: <External Network net2 (NAME)>
+net2IngressFIP: <FIP for net2 ingress (IPaddr)>
+net2IngressAllowedSources: ["0.0.0.0/0"]
+
+# A list of destinations that will be routed from Net2 subnet back towards the Primary Cluster network router.
+# These are implemented as neutron host routes on the Net2 subnet.
+# Should include:
+# - IP of disconnected installation registry (plus any ECS/S3 endpoint IP it uses)
+# - IP of API endpoint of OpenStack cloud
+# (Routes for DNS servers do not need to be specified here; they are added automatically where appropriate)
+# (Routes for comms to controlplane on primary ospSubnet are also added automatically)
+net2RoutesViaPriNetwork: [] # <List of dests to route (List of CIDR)>
+
+# A list of destinations that the primary network nodes can access via the Net2 network.
+# This is mostly to enable a cluster whose primary network is NOT Internet, allowing
+#  the API to be on a non-Internet network (when Internet is Net2).
+# If Internet is the Net2, it may be necessary to include:
+# - IP of disconnected installation registry (plus any ECS/S3 endpoint IP it uses)
+# - IP of API endpoint of OpenStack cloud
+# Special consideration (routing for sshAllowedSources) would need to be implemented to allow
+#  SSH admin access from UKC office...
+# Alternatively, this could be used when Internet is Pri network to implement specific customer requirements
+#  for all nodes to have access to some Net2 resources.
+priNetRoutesViaNet2Network: []    # <List of dests to route (List of CIDR)>
+
+
+#################################################################################################################
+# Extra Gateway on Primary network - a secondary network connection and ingress on the primary network 
+# Should work fine with v4.6 (unless Net2 is also enabled)
+# At this point, siting the cluster ExternalDNS on EG is not supported; routing would be made too complex?
+# However, private DNS servers that will be used in zone forwards should be accessible via a CIDR specified in 
+#  both egRoutesOnPriNetwork (and egRoutesOnNet2Network when Net2 is also enabled)
+extraGateway: False
+egExternalNetwork: <External Network Extra Gateway (NAME)>
+egIngressFIP: <FIP for EG ingress (IPaddr) or "" to disable EG ingress>
+egIngressAllowedSources: ["0.0.0.0/0"]
+
+# Routes for EG that are added on the Primary network nodes via neutron subnet config
+# Note: these routes must include any client IPs that are to access egIngressFIP from the egExternalNetwork
+egRoutesOnPriNetwork: []    # <List of dests to route from Pri network to Extra Gateway  (List of CIDR)>
+
+# List of destinations on EG that should be accessible from Net2 nodes, via routes which are added automatically 
+#  as follows (possibly identical to egRoutesOnPriNetwork if that is the requirement):
+# - Routes added to Net2 subnet to send traffic to Pri router
+# - Routes on the Pri router to send these dests toward the EG router
+# - A return route for the whole Net2 subnet on the EG router, sending replies back to the Pri router 
+egRoutesOnNet2Network: []   # <List of dests to route from Net2 network to Extra Gateway  (List of CIDR)>
+
+
+#################################################################################################################
+# Disconnected install (usually needed for net2...)
+# - if disconnected, the openshift-install in the path needs to be custom for the specific 
+#   disconnected registry referenced in the imageContentSources block.
+# - the entire imageContentSources: string should be indented by 2 spaces under the | as show in the example.
+# - unless the private registry allows anonymous pull, the pull-secret.txt file should include an auth
+#   entry for the private registry.
+disconnectedInstall: False
+installConfigExtraParams: |
+  imageContentSources:
+  - mirrors:
+    - privateregistry.example.com/disconnectedpath
+    source: quay.io/openshift-release-dev/ocp-release
+  - mirrors:
+    - privateregistry.example.com/disconnectedpath
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev

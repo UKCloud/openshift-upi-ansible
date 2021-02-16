@@ -1,0 +1,510 @@
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+
+# There will be a number of the controlplane-sg ports that are only intended for access between controlplane machines
+# However, the default playbooks open them for the whole subnet, so I will just add the net2 subnet...
+# Future work - migrate to remote sg's being specified as destinations for the ports that really are controlplane-only etc,
+# and work out which ports all the workers need to talk to each other on (such as mDNS and VXLAN) and remove unnecessary rules)
+
+- import_playbook: common.yaml
+- import_playbook: net2-common.yaml
+
+- hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: 'Create the Net2 worker security group'
+    os_security_group:
+      name: "{{ os_net2_sg_worker }}"
+
+  - name: 'Set worker Net2 security group tag'
+    command:
+      cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_net2_sg_worker }} "
+
+  - name: 'Create the Net2 ingress security group'
+    os_security_group:
+      name: "{{ os_net2_sg_ingress }}"
+
+  - name: 'Set Net2 ingress security group tag'
+    command:
+      cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_net2_sg_ingress }} "
+
+  - name: 'Create controlplane-sg rule "machine config server" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 22623
+      port_range_max: 22623
+
+  - name: 'Create controlplane-sg rule "DNS (TCP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      protocol: tcp
+      port_range_min: 53
+      port_range_max: 53
+
+  - name: 'Create controlplane-sg rule "DNS (UDP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      protocol: udp
+      port_range_min: 53
+      port_range_max: 53
+
+  - name: 'Create controlplane-sg rule "mDNS" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      protocol: udp
+      port_range_min: 5353
+      port_range_max: 5353
+
+  - name: 'Create controlplane-sg rule "VXLAN" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 4789
+      port_range_max: 4789
+
+  - name: 'Create controlplane-sg rule "Geneve" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 6081
+      port_range_max: 6081
+
+  - name: 'Create controlplane-sg rule "ovndb" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 6641
+      port_range_max: 6642
+
+  - name: 'Create controlplane-sg rule "controlplane ingress internal (TCP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create controlplane-sg rule "controlplane ingress internal (UDP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create controlplane-sg rule "kube scheduler" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 10259
+      port_range_max: 10259
+
+  - name: 'Create controlplane-sg rule "kube controller manager" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 10257
+      port_range_max: 10257
+
+  - name: 'Create controlplane-sg rule "controlplane ingress kubelet secure" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 10250
+      port_range_max: 10250
+
+  - name: 'Create controlplane-sg rule "etcd" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 2379
+      port_range_max: 2380
+
+  - name: 'Create controlplane-sg rule "controlplane ingress services (TCP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+  - name: 'Create controlplane-sg rule "controlplane ingress services (UDP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_controlplane }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+#  Likely no need for VRRP to cross between subnets ...      
+#  - name: 'Create controlplane-sg rule "VRRP" for Net2 subnet'
+#    os_security_group_rule:
+#      security_group: "{{ os_sg_controlplane }}"
+#      protocol: '112'
+#      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+
+  - name: 'Create worker-sg rule "mDNS" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 5353
+      port_range_max: 5353
+
+  - name: 'Create worker-sg rule "router" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 1936
+      port_range_max: 1936
+
+  - name: 'Create worker-sg rule "VXLAN" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 4789
+      port_range_max: 4789
+
+  - name: 'Create worker-sg rule "Geneve" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 6081
+      port_range_max: 6081
+
+  - name: 'Create worker-sg rule "worker ingress internal (TCP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create worker-sg rule "worker ingress internal (UDP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create worker-sg rule "worker ingress kubelet insecure" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 10250
+      port_range_max: 10250
+
+  - name: 'Create worker-sg rule "worker ingress services (TCP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+  - name: 'Create worker-sg rule "worker ingress services (UDP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+#  Likely no need for VRRP to cross between subnets ...
+#  - name: 'Create worker-sg rule "VRRP" for Net2 subnet'
+#    os_security_group_rule:
+#      security_group: "{{ os_sg_worker }}"
+#      protocol: '112'
+#      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+
+  - name: 'Create infra-sg rule "mDNS" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 5353
+      port_range_max: 5353
+
+  - name: 'Create infra-sg rule "router" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 1936
+      port_range_max: 1936
+
+  - name: 'Create infra-sg rule "VXLAN" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 4789
+      port_range_max: 4789
+
+  - name: 'Create infra-sg rule "Geneve" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 6081
+      port_range_max: 6081
+
+  - name: 'Create infra-sg rule "infra ingress internal (TCP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create infra-sg rule "infra ingress internal (UDP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create infra-sg rule "infra ingress kubelet insecure" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 10250
+      port_range_max: 10250
+
+  - name: 'Create infra-sg rule "infra ingress services (TCP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+  - name: 'Create infra-sg rule "infra ingress services (UDP)" for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_infra }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+#  Likely no need for VRRP to cross between subnets ...
+#  - name: 'Create infra-sg rule "VRRP" for Net2 subnet'
+#    os_security_group_rule:
+#      security_group: "{{ os_sg_infra }}"
+#      protocol: '112'
+#      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+
+  - name: 'Create net2-worker-sg rule "mDNS"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 5353
+      port_range_max: 5353
+
+  - name: 'Create net2-worker-sg rule "router"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 1936
+      port_range_max: 1936
+
+  - name: 'Create net2-worker-sg rule "VXLAN"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 4789
+      port_range_max: 4789
+
+  - name: 'Create net2-worker-sg rule "Geneve"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 6081
+      port_range_max: 6081
+
+  - name: 'Create net2-worker-sg rule "worker ingress internal (TCP)"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create net2-worker-sg rule "worker ingress internal (UDP)"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create net2-worker-sg rule "worker ingress kubelet insecure"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 10250
+      port_range_max: 10250
+
+  - name: 'Create net2-worker-sg rule "worker ingress services (TCP)"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+  - name: 'Create net2-worker-sg rule "worker ingress services (UDP)"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+  - name: 'Create net2-worker-sg rule "VRRP"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: '112'
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+
+  - name: 'Create net2-worker-sg rule "mDNS" for primary network'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 5353
+      port_range_max: 5353
+
+  - name: 'Create net2-worker-sg rule "router" for primary network'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 1936
+      port_range_max: 1936
+
+  - name: 'Create net2-worker-sg rule "VXLAN" for primary network'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 4789
+      port_range_max: 4789
+
+  - name: 'Create net2-worker-sg rule "Geneve" for primary network'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 6081
+      port_range_max: 6081
+
+  - name: 'Create net2-worker-sg rule "worker ingress internal (TCP)" for primary network'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create net2-worker-sg rule "worker ingress internal (UDP)" for primary network'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 9000
+      port_range_max: 9999
+
+  - name: 'Create net2-worker-sg rule "worker ingress kubelet insecure" for primary network'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 10250
+      port_range_max: 10250
+
+  - name: 'Create net2-worker-sg rule "worker ingress services (TCP)" for primary network'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: tcp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+  - name: 'Create net2-worker-sg rule "worker ingress services (UDP)" for primary network'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_worker }}"
+      protocol: udp
+      remote_ip_prefix: "{{ os_subnet_range }}"
+      port_range_min: 30000
+      port_range_max: 32767
+
+  - name: 'Create api-sg rule "OpenShift API" internal for Net2 subnet'
+    os_security_group_rule:
+      security_group: "{{ os_sg_api }}"
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      protocol: tcp
+      port_range_min: 6443
+      port_range_max: 6443
+
+  - name: 'Create net2-ingress-sg rule "Ingress HTTP internal"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_ingress }}"
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      protocol: tcp
+      port_range_min: 80
+      port_range_max: 80
+
+  - name: 'Create net2-ingress-sg rule "Ingress HTTPS internal"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_ingress }}"
+      remote_ip_prefix: "{{ os_net2_subnet_range }}"
+      protocol: tcp
+      port_range_min: 443
+      port_range_max: 443
+
+  - name: 'Create net2-ingress-sg rule "Net2 Ingress HTTP external"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_ingress }}"
+      remote_ip_prefix: "{{ item }}"
+      protocol: tcp
+      port_range_min: 80
+      port_range_max: 80
+    loop: "{{ net2IngressAllowedSources }}"
+
+  - name: 'Create net2-ingress-sg rule "Net2 Ingress HTTPS external"'
+    os_security_group_rule:
+      security_group: "{{ os_net2_sg_ingress }}"
+      remote_ip_prefix: "{{ item }}"
+      protocol: tcp
+      port_range_min: 443
+      port_range_max: 443
+    loop: "{{ net2IngressAllowedSources }}"

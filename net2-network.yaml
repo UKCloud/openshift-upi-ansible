@@ -1,0 +1,111 @@
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+# netaddr
+
+- import_playbook: common.yaml
+- import_playbook: net2-common.yaml
+
+- hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: 'Create the Net2 network'
+    os_network:
+      name: "{{ os_net2_network }}"
+
+  - name: 'Set tags on the Net2 network'
+    command:
+      cmd: "openstack network set --tag {{ os_net2_network_tag }} --tag {{ cluster_id_tag }} {{ os_net2_network }}"
+
+  - name: 'Create the Net2 subnet'
+    os_subnet:
+      name: "{{ os_net2_subnet }}"
+      network_name: "{{ os_net2_network }}"
+      cidr: "{{ os_net2_subnet_range }}"
+      allocation_pool_start: "{{ os_net2_subnet_range | next_nth_usable(10) }}"
+      allocation_pool_end: "{{ os_net2_subnet_range | ipaddr('last_usable') | ipmath(-2) }}"
+
+  - name: 'Set tags on Net2 subnet'
+    command:
+      cmd: "openstack subnet set --tag {{ cluster_id_tag }} {{ os_net2_subnet }}"
+
+# Kuryr tasks removed
+
+  - name: 'Create Net2 external router'
+    os_router:
+      name: "{{ os_net2_router }}"
+      network: "{{ os_net2_external_network }}"
+      interfaces:
+      - net: "{{ os_net2_network }}"
+        subnet: "{{ os_net2_subnet }}"
+        portip: "{{ os_net2_subnet_range | next_nth_usable(1) }}"
+    when: os_net2_external_network is defined and os_net2_external_network|length>0
+
+  - name: 'Create port for primary router on net2 network'
+    os_port:
+      name: "{{ os_net2_port_pri_router }}"
+      state: present
+      network: "{{ os_net2_network }}"
+      fixed_ips: 
+      - ip_address: "{{ os_net2_pri_net_router_ip }}"
+
+  - name: 'Set tag on the new port'
+    command:
+      cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_net2_port_pri_router }}"
+
+    # os_router module appears unwilling to update existing router to add interface so cmd...    
+  - name: 'Connect port to primary router to give access to/from the net2 network'
+    command: openstack router add port "{{ os_router }}" "{{ os_net2_port_pri_router }}"
+
+    # If we access DNS via the Primary network:
+  - name: 'Set host route on Net2 subnet to allow access to DNS via primary network'
+    command: openstack subnet set --host-route "destination={{ externalDNS[0] }}/32,gateway={{ os_net2_pri_net_router_ip }}" --host-route "destination={{ externalDNS[1] }}/32,gateway={{ os_net2_pri_net_router_ip }}"  "{{ os_net2_subnet }}"
+    when: externalDNSisOnNet2 is defined and not externalDNSisOnNet2
+
+    # If we access DNS via Net2 network 
+  - name: 'Set route on Primary router to allow access to DNS via Net2'
+    command: openstack router set --route "destination={{ externalDNS[0] }}/32,gateway={{ os_net2_subnet_range | next_nth_usable(1) }}" --route "destination={{ externalDNS[1] }}/32,gateway={{ os_net2_subnet_range | next_nth_usable(1) }}"  "{{ os_router }}"
+    when: externalDNSisOnNet2 is defined and externalDNSisOnNet2
+
+  - name: 'Add route on Net2 router to allow access to primary network'
+    command: openstack router set --route "destination={{ ospSubnet }},gateway={{ os_net2_pri_net_router_ip }}"  "{{ os_net2_router }}"
+
+# Kuryr tasks removed
+
+  - name: 'Create the Net2 Ingress port'
+    os_port:
+      name: "{{ os_net2_port_ingress }}"
+      network: "{{ os_net2_network }}"
+      security_groups:
+      - "{{ os_net2_sg_ingress }}"
+      fixed_ips:
+      - subnet: "{{ os_net2_subnet }}"
+        ip_address: "{{ os_net2_ingressVIP }}"
+
+  - name: 'Set the Net2 Ingress port tag'
+    command:
+      cmd: "openstack port set --tag {{ cluster_id_tag }} {{ os_net2_port_ingress }}"
+
+  # NOTE: openstack ansible module doesn't allow attaching Floating IPs to
+  # ports, let's use the CLI instead
+  - name: 'Attach the Net2 Ingress floating IP to Ingress port'
+    command:
+      cmd: "openstack floating ip set --port {{ os_net2_port_ingress }} {{ os_net2_ingress_fip }}"
+    when: os_net2_ingress_fip is defined and os_net2_ingress_fip|length>0
+
+  - name: 'Set DNS on Net2 subnet'
+    command: openstack subnet set --dns-nameserver "{{ externalDNS[0] }}" --dns-nameserver "{{ externalDNS[1] }}"  "{{ os_net2_subnet }}"
+
+  - name: 'Set routes on Net2 subnet to allow access to primary network'
+    command: openstack subnet set --host-route "destination={{ os_subnet_range }},gateway={{ os_net2_pri_net_router_ip }}"  "{{ os_net2_subnet }}"
+
+  - name: 'Set additional routes on Net2 subnet'
+    command: openstack subnet set --host-route "destination={{ item }},gateway={{ os_net2_pri_net_router_ip }}"  "{{ os_net2_subnet }}"
+    loop: "{{ net2RoutesViaPriNetwork }}"
+
+  - name: 'Set routes on Primary router to allow selective outbound access from Pri Net via Net2'
+    command: openstack router set --route "destination={{ item }},gateway={{ os_net2_subnet_range | next_nth_usable(1) }}"  "{{ os_router }}"
+    loop: "{{ priNetRoutesViaNet2Network }}"

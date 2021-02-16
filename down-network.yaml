@@ -5,12 +5,30 @@
 # openstacksdk
 
 - import_playbook: common.yaml
+- import_playbook: net2-common.yaml
+  when: net2 | default(false) | bool
+- import_playbook: eg-common.yaml
+  when: extraGateway | default(false) | bool
 
 - hosts: all
   gather_facts: no
 
   tasks:
-  - name: 'List ports attatched to router'
+  - name: 'Remove all routes from router'
+    command:
+      cmd: "openstack router set --no-route {{ os_router }}"
+
+  - name: 'Remove all routes from Net2 router'
+    command:
+      cmd: "openstack router set --no-route {{ os_net2_router }}"
+    when: net2 | default(false) | bool
+
+  - name: 'Remove all routes from EG router on  Pri net'
+    command:
+      cmd: "openstack router set --no-route {{ os_eg_router }}"
+    when: extraGateway | default(false) | bool
+
+  - name: 'List ports attached to routers'
     command:
       cmd: "openstack port list --device-owner=network:router_interface --tags {{ cluster_id_tag }} -f value -c id"
     register: router_ports
@@ -19,6 +37,18 @@
     command:
       cmd: "openstack router remove port {{ os_router }} {{ item.1}}"
     with_indexed_items: "{{ router_ports.stdout_lines }}"
+
+  - name: 'Remove the ports from Net2 router'
+    command:
+      cmd: "openstack router remove port {{ os_net2_router }} {{ item.1}}"
+    with_indexed_items: "{{ router_ports.stdout_lines }}"
+    when: net2 | default(false) | bool
+
+  - name: 'Remove the ports from EG router on Pri net'
+    command:
+      cmd: "openstack router remove port {{ os_eg_router }} {{ item.1}}"
+    with_indexed_items: "{{ router_ports.stdout_lines }}"
+    when: extraGateway | default(false) | bool
 
   - name: 'List ha ports attached to router'
     command:
@@ -29,6 +59,18 @@
     command:
       cmd: "openstack router remove port {{ os_router }} {{ item.1}}"
     with_indexed_items: "{{ ha_router_ports.stdout_lines }}"
+
+  - name: 'Remove the ha ports from Net2 router'
+    command:
+      cmd: "openstack router remove port {{ os_net2_router }} {{ item.1}}"
+    with_indexed_items: "{{ ha_router_ports.stdout_lines }}"
+    when: net2 | default(false) | bool
+
+  - name: 'Remove the ha ports from EG router on Pri net'
+    command:
+      cmd: "openstack router remove port {{ os_eg_router }} {{ item.1}}"
+    with_indexed_items: "{{ ha_router_ports.stdout_lines }}"
+    when: extraGateway | default(false) | bool
 
   - name: 'List ports'
     command:
@@ -44,6 +86,18 @@
     os_router:
       name: "{{ os_router }}"
       state: absent
+
+  - name: 'Remove the Net2 router'
+    os_router:
+      name: "{{ os_net2_router }}"
+      state: absent
+    when: net2 | default(false) | bool
+
+  - name: 'Remove the EG router for Pri net'
+    os_router:
+      name: "{{ os_eg_router }}"
+      state: absent
+    when: extraGateway | default(false) | bool
 
   - name: 'List cluster networks'
     command:

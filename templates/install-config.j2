@@ -17,16 +17,16 @@ metadata:
   name: {{ custID }}
 networking:
   clusterNetwork:
-  - cidr: 10.128.0.0/14
+  - cidr: {{ osClusterNetwork | default("10.128.0.0/14") }}
     hostPrefix: 23
   machineNetwork:
   - cidr: {{ ospSubnet }}
   networkType: OpenShiftSDN
   serviceNetwork:
-  - 172.30.0.0/16
+  - {{ osServiceNetwork | default("172.30.0.0/16") }}
 platform:
   openstack:
-    apiVIP: 10.0.0.5
+    apiVIP: {{ os_apiVIP }}
     cloud: openstack
     computeFlavor: ocp.m1.medium
     clusterOSImage: {{ rhcosImage }}
@@ -35,8 +35,11 @@ platform:
     - {{ dnsServer }}
 {% endfor %}
     externalNetwork: internet
-    ingressVIP: 10.0.0.7
+    ingressVIP: {{ os_ingressVIP }}
     lbFloatingIP: {{ apiFIP }}
 publish: External
 pullSecret: '{{ pullSecret }}'
 sshKey: {{ sshKey }}
+{% if disconnectedInstall %}
+{{ installConfigExtraParams }}
+{% endif %}

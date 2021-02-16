@@ -8,3 +8,9 @@
     - "worker-default"
     - "infra"
     - "controlplane"
+
+  - name: Remove net2 server group
+    openstack.cloud.server_group:
+      state: absent
+      name: "worker-net2"
+    when: net2 | default(false) | bool

@@ -2,6 +2,22 @@
 - import_playbook: manifests.yaml
 - import_playbook: security-groups.yaml
 - import_playbook: network.yaml
+
+- import_playbook: net2-security-groups.yaml
+  when: net2 | default(false) | bool
+- import_playbook: net2-network.yaml
+  when: net2 | default(false) | bool
+
+- import_playbook: eg-security-groups.yaml
+  when: extraGateway | default(false) | bool
+- import_playbook: eg-network.yaml
+  when: extraGateway | default(false) | bool
+
+- import_playbook: eg-net2-routes.yaml 
+  when: 
+    - net2 | default(false) | bool
+    - extraGateway | default(false) | bool
+
 - import_playbook: bootstrap.yaml
 - import_playbook: control-plane.yaml
 

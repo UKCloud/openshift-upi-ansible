@@ -40,6 +40,6 @@ platform:
 publish: External
 pullSecret: '{{ pullSecret }}'
 sshKey: {{ sshKey }}
-{% if disconnectedInstall %}
+{% if disconnectedInstall | default(false) | bool %}
 {{ installConfigExtraParams }}
 {% endif %}

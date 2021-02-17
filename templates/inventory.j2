@@ -9,7 +9,7 @@ all:
       os_flavor_controlplane: 'ocp.m1.medium'
       os_flavor_worker: 'ocp.m1.medium'
       os_image_rhcos: "{{ rhcosImage }}"
-{% if net2 %}
+{% if net2 | default(false) | bool %}
       # Net2 values
       os_net2_subnet_range: "{{ net2OspSubnet }}"
       os_net2_external_network: "{{ net2ExternalNetwork }}"
@@ -19,7 +19,7 @@ all:
       os_net2_pri_net_router_ip: {% raw %}"{{ os_net2_subnet_range | ipaddr('last_usable') }}"{% endraw %}
 
 {% endif %}
-{% if extraGateway %}
+{% if extraGateway | default(false) | bool %}
       # Extra Gateway values for Primary network
       os_eg_external_network: "{{ egExternalNetwork }}"
       os_eg_ingress_fip: "{{ egIngressFIP }}"

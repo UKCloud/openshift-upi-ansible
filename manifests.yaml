@@ -34,7 +34,7 @@
       regexp: '^\s{2}mastersSchedulable: true$'
       replace: '  mastersSchedulable: False'
 
-  - name: Include vars from worker machinset to obtain cluster ID (not available from metadata.json cos it aint been generated yet)
+  - name: Include vars from worker machineset to obtain cluster ID (not available from metadata.json cos it aint been generated yet)
     include_vars:
       file: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
       name: machineSetData      

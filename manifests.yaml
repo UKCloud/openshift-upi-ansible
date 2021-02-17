@@ -34,6 +34,11 @@
       regexp: '^\s{2}mastersSchedulable: true$'
       replace: '  mastersSchedulable: False'
 
+  - name: Include vars from worker machinset to obtain cluster ID (not available from metadata.json cos it aint been generated yet)
+    include_vars:
+      file: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
+      name: machineSetData      
+
 
 - import_playbook: net2-manifests.yaml
   when: net2 | default(false) | bool
@@ -58,6 +63,18 @@
       path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
       regexp: '^\s{2}replicas: 0$'
       replace: '  replicas: {{ initialWorkerCount }}'
+
+  - name: Find/replace MachineSet Name
+    replace:
+        path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
+        regexp: "{{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}-worker-0"
+        replace: "{{ ( custID + '-' + workerFlavor ) | replace('.','-') | replace('ocp-','') | replace('app-','') }}-worker"
+
+  - name: Find/replace serverMetadata Name
+    replace:
+        path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
+        regexp: "Name: {{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}-worker"
+        replace: "Name: {{ ( custID + '-' + workerFlavor ) | replace('.','-') | replace('ocp-','') | replace('app-','') }}-worker"
 
   - name: Generate ignition configs
     command: openshift-install create ignition-configs --dir=./

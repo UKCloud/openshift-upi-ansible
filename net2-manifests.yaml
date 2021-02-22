@@ -21,13 +21,32 @@
     replace:
       path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
       regexp: '^\s{2}replicas: 0$'
-      replace: '  replicas: {{ net2InitialWorkerCount }}'
+      replace: '  replicas: {{ net2InitialWorkerCount | default (0) }}'
+
+  - name: Find/replace worker flavor
+    replace:
+        path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml    
+        regexp: "flavor: {{ workerFlavor }}"
+        replace: "flavor: {{ net2WorkerFlavor }}"
+    when: net2WorkerFlavor is defined and net2WorkerFlavor|length>0
 
   - name: Find/replace MachineSet, server and security group name
     replace:
         path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml    
         regexp: "-worker"
         replace: "-net2-worker"
+
+  - name: Find/replace MachineSet Name
+    replace:
+        path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml    
+        regexp: "{{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}-net2-worker-0"
+        replace: "{{ ( custID + '-' + net2WorkerFlavor ) | replace('.','-') | replace('ocp-','') | replace('app-','') }}-net2-worker"
+
+  - name: Find/replace serverMetadata Name
+    replace:
+        path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml    
+        regexp: "Name: {{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}-net2-worker"
+        replace: "Name: {{ ( custID + '-' + net2WorkerFlavor ) | replace('.','-') | replace('ocp-','') | replace('app-','') }}-net2-worker"
 
   - name: Find/replace subnet name
     replace:

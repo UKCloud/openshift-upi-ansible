@@ -4,13 +4,17 @@ compute:
 - architecture: amd64
   hyperthreading: Enabled
   name: worker
-  platform: {}
+  platform:
+    openstack:
+      type: {{ workerFlavor }}
   replicas: 0
 controlPlane:
   architecture: amd64
   hyperthreading: Enabled
   name: controlplane
-  platform: {}
+  platform: 
+    openstack:
+      type: {{ controlplaneFlavor }}
   replicas: 3
 metadata:
   creationTimestamp: null
@@ -28,7 +32,6 @@ platform:
   openstack:
     apiVIP: {{ os_apiVIP }}
     cloud: openstack
-    computeFlavor: ocp.m1.medium
     clusterOSImage: {{ rhcosImage }}
     externalDNS:
 {% for dnsServer in externalDNS %}

@@ -2,6 +2,8 @@ custID: <Estate API ID for cluster (string)>
 baseDomain: <Base domain for OSP region (string)>
 rhcosImage: <rhcos image present in OSP project (NAME)>
 externalDNS: <List of exactly 2 DNS servers (List of IPaddr)> 
+controlplaneFlavor: ocp.m1.medium # <OpenStack Flavor (NAME)>
+workerFlavor: ocp.t1.xxlarge # <OpenStack Flavor (NAME)>
 initialWorkerCount: 2
 
 # Primary network params
@@ -34,6 +36,7 @@ neustarUltraDnsPassword: "password"
 #    or via the primary network (when set to False).
 net2: False
 externalDNSisOnNet2: False 
+net2WorkerFlavor: ocp.t1.xxlarge # <OpenStack Flavor (NAME)>
 net2InitialWorkerCount: 2
 net2OspSubnet: <Subnet for net2 machines (CIDR)>
 net2ExternalNetwork: <External Network net2 (NAME)>

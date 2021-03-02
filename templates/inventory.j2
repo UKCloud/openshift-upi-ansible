@@ -6,8 +6,8 @@ all:
 
       # User-provided values
       os_subnet_range: "{{ ospSubnet }}"
-      os_flavor_controlplane: 'ocp.m1.medium'
-      os_flavor_worker: 'ocp.m1.medium'
+      os_flavor_controlplane: "{{ controlplaneFlavor }}"
+      os_flavor_worker: "{{ workerFlavor }}"
       os_image_rhcos: "{{ rhcosImage }}"
 {% if net2 | default(false) | bool %}
       # Net2 values

@@ -1,6 +1,11 @@
 - import_playbook: server-groups.yaml
 - import_playbook: manifests.yaml
 - import_playbook: security-groups.yaml
+
+- import_playbook: pingdom-security-groups.yaml
+  when: (apiAllowedSources[0] is defined and apiAllowedSources[0] != "0.0.0.0/0") or
+        (ingressAllowedSources[0] is defined and ingressAllowedSources[0] != "0.0.0.0/0")
+
 - import_playbook: network.yaml
 
 - import_playbook: net2-security-groups.yaml

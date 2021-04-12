@@ -1,0 +1,69 @@
+- import_playbook: common.yaml
+
+- hosts: localhost
+  gather_facts: no
+  
+  tasks:
+  - name: 'Download RSS feed of current Pingdom probes'
+    get_url:
+      url: https://my.pingdom.com/probes/feed
+      dest: /tmp/pingdom_probe_feed.xml
+      force: yes
+
+  - name: 'Interpret the xml to select for Europe probes'
+    community.general.xml:
+      path: /tmp/pingdom_probe_feed.xml
+      xpath: /rss/channel/item[pingdom:region='EU']/pingdom:ip
+      content: text
+      namespaces:
+        pingdom: http://www.pingdom.com/ns/PingdomRSSNamespace
+    register: xmlrespitems
+
+  - name: 'Delete temporary file'
+    file:
+      path: /tmp/pingdom_probe_feed.xml
+      state: absent  
+
+  - name: 'Format data as a list of IP addresses'
+    set_fact:
+      pingdomprobeips: "{{ xmlrespitems | community.general.json_query('matches[][\"{http://www.pingdom.com/ns/PingdomRSSNamespace}ip\"]') | flatten | sort }}"
+
+  - name: 'Print Pingdom IPs and check the list is long enough to be reasonable'
+    ansible.builtin.debug:
+      var: pingdomprobeips
+    any_errors_fatal: true
+    failed_when: "pingdomprobeips|length < 10"
+
+  - name: 'Create the API pingdom security group'
+    os_security_group:
+      name: "{{ os_sg_api_pingdom }}" 
+
+  - name: 'Set API pingdom security group tag'
+    command:
+      cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_api_pingdom }} "          
+
+  - name: 'Create the Ingress pingdom security group'
+    os_security_group:
+      name: "{{ os_sg_ingress_pingdom }}" 
+
+  - name: 'Set API pingdom security group tag'
+    command:
+      cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_ingress_pingdom }} "          
+
+  - name: 'Create api-pingdom rules'
+    os_security_group_rule:
+      security_group: "{{ os_sg_api_pingdom }}"
+      remote_ip_prefix: "{{ item }}"
+      protocol: tcp
+      port_range_min: 6443
+      port_range_max: 6443
+    loop: "{{ pingdomprobeips }}"
+
+  - name: 'Create ingress-pingdom rules'
+    os_security_group_rule:
+      security_group: "{{ os_sg_ingress_pingdom }}"
+      remote_ip_prefix: "{{ item }}"
+      protocol: tcp
+      port_range_min: 443
+      port_range_max: 443
+    loop: "{{ pingdomprobeips }}"

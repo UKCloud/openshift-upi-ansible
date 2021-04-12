@@ -3,8 +3,10 @@
 - import_playbook: security-groups.yaml
 
 - import_playbook: pingdom-security-groups.yaml
-  when: (apiAllowedSources[0] is defined and apiAllowedSources[0] != "0.0.0.0/0") or
-        (ingressAllowedSources[0] is defined and ingressAllowedSources[0] != "0.0.0.0/0")
+  when: 
+  - (apiAllowedSources[0] is defined and apiAllowedSources[0] != "0.0.0.0/0") or
+    (ingressAllowedSources[0] is defined and ingressAllowedSources[0] != "0.0.0.0/0")
+  - pingdomAllowed | default(true) | bool
 
 - import_playbook: network.yaml
 

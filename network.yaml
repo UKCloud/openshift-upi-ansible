@@ -132,7 +132,9 @@
   - name: 'Attach Pingdom API security group'
     command:
       cmd: "openstack port set --security-group {{ os_sg_api_pingdom }} {{ os_port_api }}"
-    when: apiAllowedSources[0] is defined and apiAllowedSources[0] != "0.0.0.0/0"
+    when: 
+    - apiAllowedSources[0] is defined and apiAllowedSources[0] != "0.0.0.0/0"
+    - pingdomAllowed | default(true) | bool
       
   - name: 'Create the Ingress port'
     os_port:
@@ -151,7 +153,9 @@
   - name: 'Attach Pingdom Ingress security group'
     command:
       cmd: "openstack port set --security-group {{ os_sg_ingress_pingdom }} {{ os_port_ingress }}"
-    when: ingressAllowedSources[0] is defined and ingressAllowedSources[0] != "0.0.0.0/0"
+    when: 
+    - ingressAllowedSources[0] is defined and ingressAllowedSources[0] != "0.0.0.0/0"
+    - pingdomAllowed | default(true) | bool
 
 
   # NOTE: openstack ansible module doesn't allow attaching Floating IPs to

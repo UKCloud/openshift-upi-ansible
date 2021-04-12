@@ -15,6 +15,7 @@ bootstrapFIP: <FIP for bootstrap access (IPaddr)>
 apiAllowedSources: ["0.0.0.0/0"]
 ingressAllowedSources: ["0.0.0.0/0"]
 sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format (List of CIDR)>
+pingdomAllowed: True
 
 # Neustar account to allow DNS records to be created
 neustarUltraDnsUsername: "username"

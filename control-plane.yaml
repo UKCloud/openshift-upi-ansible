@@ -28,7 +28,9 @@
   - name: 'Attach Pingdom API security group'
     command:
       cmd: "openstack port set --security-group {{ os_sg_api_pingdom }} {{ item.1 }}-{{ item.0 }}"
-    when: apiAllowedSources[0] is defined and apiAllowedSources[0] != "0.0.0.0/0"
+    when: 
+    - apiAllowedSources[0] is defined and apiAllowedSources[0] != "0.0.0.0/0"
+    - pingdomAllowed | default(true) | bool
     with_indexed_items: "{{ [os_port_controlplane] * os_cp_nodes_number }}"
     
   - name: 'Set Control Plane ports tag'

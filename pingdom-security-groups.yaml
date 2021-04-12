@@ -49,7 +49,7 @@
       name: "{{ os_sg_ingress_pingdom }}" 
     when: ingressAllowedSources[0] is defined and ingressAllowedSources[0] != "0.0.0.0/0"
 
-  - name: 'Set API pingdom security group tag'
+  - name: 'Set Ingress pingdom security group tag'
     command:
       cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_sg_ingress_pingdom }} "
     when: ingressAllowedSources[0] is defined and ingressAllowedSources[0] != "0.0.0.0/0"

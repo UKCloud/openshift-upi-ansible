@@ -1,4 +1,5 @@
 - hosts: localhost
+
   tasks:
   - name: Set pull secret var
     set_fact:
@@ -39,13 +40,71 @@
       file: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
       name: machineSetData      
 
+  - name: Set clusterId as a temporary early version of InfraID var
+    set_fact:
+      clusterID: "{{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}"
 
 - import_playbook: net2-manifests.yaml
   when: net2 | default(false) | bool
 
 
 - hosts: localhost
+  vars:
+    infraMachineSetScale: 2
+    # Infra machines will not deploy until post-deployment creates userdatasecret etc etc
+
   tasks:
+  - name: Generate a infra MachineSet from template
+    template:
+      src: infra-machineset.j2
+      dest: openshift/99_openshift-cluster-api_infra-machineset-0.yaml
+
+  - name: Create infra MachineConfigPool manifest
+    copy:
+      dest: "manifests/infra-machineconfigpool.yaml"
+      content: |
+        apiVersion: machineconfiguration.openshift.io/v1
+        kind: MachineConfigPool
+        metadata:
+          name: infra
+        spec:
+          machineConfigSelector:
+            matchExpressions:
+              - { key: machineconfiguration.openshift.io/role, operator: In, values: [ worker, infra ] }
+          nodeSelector:
+            matchLabels:
+              node-role.kubernetes.io/infra: ""
+
+  - name: Get userData from worker user-data-secret file
+    set_fact:
+      userData: "{{ lookup('file', 'openshift/99_openshift-cluster-api_worker-user-data-secret.yaml') | from_yaml | json_query(userDataQuery) | b64decode }}"
+    vars:
+      userDataQuery: "data.userData"
+
+  - name: Retrieve and modify ignition endpoint
+    set_fact:
+      ignitionEndpoint: "{{ userData | to_json | from_json | json_query(ignitionEndpointQuery) | replace('worker','infra') }}"
+    vars:
+      ignitionEndpointQuery: "ignition.config.merge[0].source"
+
+  - name: Insert changed ignition endpoint
+    set_fact:
+      infraUserData: '{{ userData | combine({"ignition": {"config": {"merge":[{"source": ignitionEndpoint, "verification":{}}]}}}, recursive=True) }}'
+
+  - name: Create infra-user-data secret file
+    copy:
+      dest: "openshift/99_openshift-cluster-api_infra-user-data-secret.yaml"
+      content: |
+        apiVersion: v1
+        metadata:
+          name: infra-user-data
+          namespace: openshift-machine-api
+        data:
+          disableTemplating: dHJ1ZQo=
+          userData: "{{ infraUserData | to_json | b64encode }}"
+        kind: Secret
+        type: Opaque
+  
   - name: Set worker server groups
     lineinfile:
       path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
@@ -67,19 +126,19 @@
   - name: Find/replace MachineSet Name
     replace:
         path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
-        regexp: "{{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}-worker-0"
+        regexp: "{{ clusterID }}-worker-0"
         replace: "{{ ( custID + '-' + workerFlavor ) | replace('.','-') | replace('ocp-','') | replace('app-','') }}-worker"
 
   - name: Find/replace serverMetadata Name
     replace:
         path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
-        regexp: "Name: {{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}-worker"
+        regexp: "Name: {{ clusterID }}-worker"
         replace: "Name: {{ ( custID + '-' + workerFlavor ) | replace('.','-') | replace('ocp-','') | replace('app-','') }}-worker"
 
   - name: Generate ignition configs
     command: openshift-install create ignition-configs --dir=./
 
-  - name: Register infra ID variable
+  - name: Register actual infra ID variable
     command: jq -r .infraID metadata.json
     register: infrastructureID
 

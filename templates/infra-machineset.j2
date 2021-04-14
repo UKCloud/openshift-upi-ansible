@@ -49,8 +49,7 @@ spec:
             name: "{{ clusterID }}-infra"
           - filter: {}
             name: "{{ clusterID }}-ingress"
-{% if ((apiAllowedSources[0] is defined and apiAllowedSources[0] != "0.0.0.0/0") or 
-      (ingressAllowedSources[0] is defined and ingressAllowedSources[0] != "0.0.0.0/0")) 
+{% if (ingressAllowedSources[0] is defined and ingressAllowedSources[0] != "0.0.0.0/0")) 
       and (pingdomAllowed | default(true) | bool) %}
           - filter: {}
             name: "{{ clusterID }}-ingress-pingdom"

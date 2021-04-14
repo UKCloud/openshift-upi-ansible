@@ -1,10 +1,5 @@
 - hosts: localhost
 
-  vars:
-    # Initial infra scale must remain at zero because post-deployment creates the userDataSecret etc
-    # and it's possible infra machines aren't desired
-    infraMachineSetScale: 0
-
   tasks:
   - name: Set pull secret var
     set_fact:
@@ -54,6 +49,11 @@
 
 
 - hosts: localhost
+  vars:
+    # Initial infra scale must remain at zero because post-deployment creates the userDataSecret etc
+    # and it's possible infra machines aren't desired
+    infraMachineSetScale: 0
+
   tasks:
   - name: Generate a infra MachineSet from template
     template:

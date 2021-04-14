@@ -50,9 +50,8 @@
 
 - hosts: localhost
   vars:
-    # Initial infra scale must remain at zero because post-deployment creates the userDataSecret etc
-    # and it's possible infra machines aren't desired
-    infraMachineSetScale: 0
+    infraMachineSetScale: 2
+    # Infra machines will not deploy until post-deployment creates userdatasecret etc etc
 
   tasks:
   - name: Generate a infra MachineSet from template

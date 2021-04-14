@@ -1,4 +1,10 @@
 - hosts: localhost
+
+  vars:
+    # Initial infra scale must remain at zero because post-deployment creates the userDataSecret etc
+    # and it's possible infra machines aren't desired
+    infraMachineSetScale: 0
+
   tasks:
   - name: Set pull secret var
     set_fact:
@@ -39,6 +45,9 @@
       file: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
       name: machineSetData      
 
+  - name: Set clusterId as a temporary early version of InfraID var
+    set_fact:
+      clusterID: "{{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}"
 
 - import_playbook: net2-manifests.yaml
   when: net2 | default(false) | bool
@@ -46,6 +55,11 @@
 
 - hosts: localhost
   tasks:
+  - name: Generate a infra MachineSet from template
+    template:
+      src: infra-machineset.j2
+      dest: openshift/99_openshift-cluster-api_infra-machineset-0.yaml
+    
   - name: Set worker server groups
     lineinfile:
       path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
@@ -67,19 +81,19 @@
   - name: Find/replace MachineSet Name
     replace:
         path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
-        regexp: "{{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}-worker-0"
+        regexp: "{{ clusterID }}-worker-0"
         replace: "{{ ( custID + '-' + workerFlavor ) | replace('.','-') | replace('ocp-','') | replace('app-','') }}-worker"
 
   - name: Find/replace serverMetadata Name
     replace:
         path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
-        regexp: "Name: {{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}-worker"
+        regexp: "Name: {{ clusterID }}-worker"
         replace: "Name: {{ ( custID + '-' + workerFlavor ) | replace('.','-') | replace('ocp-','') | replace('app-','') }}-worker"
 
   - name: Generate ignition configs
     command: openshift-install create ignition-configs --dir=./
 
-  - name: Register infra ID variable
+  - name: Register actual infra ID variable
     command: jq -r .infraID metadata.json
     register: infrastructureID
 

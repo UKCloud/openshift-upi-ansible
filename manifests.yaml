@@ -61,7 +61,7 @@
 
   - name: Create infra MachineConfigPool manifest
     copy:
-      dest: "manifests/infra-macineconfigpool.yaml"
+      dest: "manifests/infra-machineconfigpool.yaml"
       content: |
         apiVersion: machineconfiguration.openshift.io/v1
         kind: MachineConfigPool

@@ -58,7 +58,37 @@
     template:
       src: infra-machineset.j2
       dest: openshift/99_openshift-cluster-api_infra-machineset-0.yaml
-    
+
+  - name: Get userData from worker user-data-secret file
+    set_fact:
+      userData: "{{ lookup('file', 'openshift/99_openshift-cluster-api_worker-user-data-secret.yaml') | from_yaml | json_query(userDataQuery) | b64decode }}"
+    vars:
+      userDataQuery: "data.userData"
+
+  - name: Retrieve and modify ignition endpoint
+    set_fact:
+      ignitionEndpoint: "{{ userData | to_json | from_json | json_query(ignitionEndpointQuery) | replace('worker','infra') }}"
+    vars:
+      ignitionEndpointQuery: "ignition.config.merge[0].source"
+
+  - name: Insert changed ignition endpoint
+    set_fact:
+      infraUserData: '{{ userData | combine({"ignition": {"config": {"merge":[{"source": ignitionEndpoint, "verification":{}}]}}}, recursive=True) }}'
+
+  - name: Create infra-user-data secret file
+    copy:
+      dest: "openshift/99_openshift-cluster-api_infra-user-data-secret.yaml"
+      content: |
+        apiVersion: v1
+        metadata:
+          name: infra-user-data
+          namespace: openshift-machine-api
+        data:
+          disableTemplating: dHJ1ZQo=
+          userData: "{{ infraUserData | to_json | b64encode }}"
+        kind: Secret
+        type: Opaque
+  
   - name: Set worker server groups
     lineinfile:
       path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml

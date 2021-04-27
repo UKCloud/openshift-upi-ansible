@@ -7,8 +7,19 @@ To run deployment fill out `vars.yml` and `files/pull-secret.txt`, and then run:
 
 The rhcos image, floating IP creation and pull-secret are not currently part of the code and need to be created/downloaded manually, and then referenced in `vars.yml`
 
+Tested with ...
 
+```
+PIP Package            Version
+---------------------- ---------
+ansible                2.10.5
+ansible-base           2.10.4
 
+Collection        Version
+----------------- -------
+community.general 2.4.0
+openstack.cloud   1.2.0
+```
 
 ## Rough method for destroying cluster (for testing ONLY)
 ```

@@ -14,6 +14,7 @@ PIP Package            Version
 ---------------------- ---------
 ansible                2.10.5
 ansible-base           2.10.4
+openstacksdk           0.52.0
 
 Collection        Version
 ----------------- -------

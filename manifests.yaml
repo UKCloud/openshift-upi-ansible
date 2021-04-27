@@ -51,7 +51,6 @@
 - hosts: localhost
   vars:
     infraMachineSetScale: 2
-    # Infra machines will not deploy until post-deployment creates userdatasecret etc etc
 
   tasks:
   - name: Generate a infra MachineSet from template

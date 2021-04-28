@@ -26,6 +26,8 @@
       os_sg_api: "{{ infraID }}-api"
       os_sg_ingress: "{{ infraID }}-ingress"
       os_sg_ssh: "{{ infraID }}-ssh"
+      os_sg_api_pingdom: "{{ infraID }}-api-pingdom"
+      os_sg_ingress_pingdom: "{{ infraID }}-ingress-pingdom"  
       # Server names
       os_bootstrap_server_name: "{{ infraID }}-bootstrap"
       os_cp_server_name: "{{ infraID }}-controlplane"

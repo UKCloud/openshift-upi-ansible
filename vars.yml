@@ -4,6 +4,7 @@ rhcosImage: <rhcos image present in OSP project (NAME)>
 externalDNS: <List of exactly 2 DNS servers (List of IPaddr)> 
 controlplaneFlavor: ocp.m1.medium # <OpenStack Flavor (NAME)>
 workerFlavor: ocp.t1.xxlarge # <OpenStack Flavor (NAME)>
+infraFlavor: ocp.m1.medium # <OpenStack Flavor (NAME)>
 initialWorkerCount: 2
 
 # Primary network params
@@ -15,6 +16,7 @@ bootstrapFIP: <FIP for bootstrap access (IPaddr)>
 apiAllowedSources: ["0.0.0.0/0"]
 ingressAllowedSources: ["0.0.0.0/0"]
 sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format (List of CIDR)>
+pingdomAllowed: True
 
 # Neustar account to allow DNS records to be created
 neustarUltraDnsUsername: "username"

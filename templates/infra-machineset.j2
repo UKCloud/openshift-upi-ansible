@@ -1,0 +1,65 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  labels:
+    machine.openshift.io/cluster-api-cluster: "{{ clusterID }}"
+  name: "{{ clusterID }}-infra"
+  name: "{{ ( custID + '-' + infraFlavor ) | replace('.','-') | replace('ocp-','') | replace('app-','') }}-infra"
+  namespace: openshift-machine-api
+spec:
+  replicas: {{ infraMachineSetScale }}
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: "{{ clusterID }}"
+      machine.openshift.io/cluster-api-machineset: "{{ clusterID }}-infra"
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: "{{ clusterID }}"
+        machine.openshift.io/cluster-api-machine-role: infra
+        machine.openshift.io/cluster-api-machine-type: infra 
+        machine.openshift.io/cluster-api-machineset: "{{ clusterID }}-infra"
+    spec:
+      metadata:
+        labels:
+          node-role.kubernetes.io/infra: ""
+      providerSpec:
+        value:
+          apiVersion: openstackproviderconfig.openshift.io/v1alpha1
+          cloudName: openstack
+          cloudsSecret:
+            name: openstack-cloud-credentials
+            namespace: openshift-machine-api
+          flavor: {{ infraFlavor }}
+{% if rhcosImage is defined %}
+          image: "{{ rhcosImage }}"
+{% else %}
+          image: "{{ clusterID }}-rhcos"
+{% endif %}
+          serverGroupID: {{ infraGroup.id }}
+          kind: OpenstackProviderSpec
+          networks:
+          - filter: {}
+            subnets:
+            - filter:
+                name: "{{ clusterID }}-nodes"
+                tags: "openshiftClusterID={{ clusterID }}"
+          securityGroups:
+          - filter: {}
+            name: "{{ clusterID }}-infra"
+          - filter: {}
+            name: "{{ clusterID }}-ingress"
+{% if (ingressAllowedSources[0] is defined and ingressAllowedSources[0] != "0.0.0.0/0")
+      and (pingdomAllowed | default(true) | bool) %}
+          - filter: {}
+            name: "{{ clusterID }}-ingress-pingdom"
+{% endif %}
+          serverMetadata:
+            Name: "{{ clusterID }}-infra"
+            openshiftClusterID: "{{ clusterID }}"
+          tags:
+          - "openshiftClusterID={{ clusterID }}"
+          trunk: true
+          userDataSecret:
+            name: infra-user-data
+

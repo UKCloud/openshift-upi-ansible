@@ -15,7 +15,7 @@
     replace:
       path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
       regexp: '^\s{6}metadata:.*'
-      replace: '      metadata:\n        labels:\n          node-role.kubernetes.io/net2: ""'
+      replace: '      metadata:\n        labels:\n          node-role.kubernetes.io/net2: ""\n          network: {{ net2ExternalNetwork | lower }}'
 
   - name: Set net2 worker scale
     replace:
@@ -29,6 +29,12 @@
         regexp: "flavor: {{ workerFlavor }}"
         replace: "flavor: {{ net2WorkerFlavor }}"
     when: net2WorkerFlavor is defined and net2WorkerFlavor|length>0
+
+  - name: Set net2 worker ingress security group
+    lineinfile:
+      path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
+      insertafter: '^\s{10}securityGroups:$'
+      line: "          - filter: {}\n            name: {{ machineSetData.metadata.labels['machine.openshift.io/cluster-api-cluster'] }}-net2-ingress"
 
   - name: Find/replace MachineSet, server and security group name
     replace:
@@ -53,5 +59,3 @@
         path: openshift/99_openshift-cluster-api_net2_worker-machineset-0.yaml
         regexp: "-nodes"
         replace: "-net2-nodes"
-
-

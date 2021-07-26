@@ -14,6 +14,8 @@
   when: net2 | default(false) | bool
 - import_playbook: net2-network.yaml
   when: net2 | default(false) | bool
+- import_playbook: net2-ingress.yaml
+  when: net2 | default(false) | bool
 
 - import_playbook: eg-security-groups.yaml
   when: extraGateway | default(false) | bool

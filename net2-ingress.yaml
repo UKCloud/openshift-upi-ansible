@@ -1,0 +1,64 @@
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+
+- import_playbook: common.yaml
+- import_playbook: net2-common.yaml
+
+- hosts: all
+  gather_facts: no
+
+  vars:
+    protocols:
+      - protocol: "HTTP"
+        port: 80
+      - protocol: "HTTPS"
+        port: 443
+
+  tasks:
+  # Unable to use openstack.cloud.loadbalancer since it errors with 400 (Validation failure: Invalid flavor_id)
+  - name: 'Create loadbalancer'
+    command:
+      cmd: openstack loadbalancer create --name "{{ os_net2_ingress_lb }}" --vip-port-id "{{ os_net2_port_ingress }}"
+
+  - name: 'Wait for loadbalancer to become ACTIVE'
+    command:
+      cmd: openstack loadbalancer show "{{ os_net2_ingress_lb }}" -c provisioning_status -f value
+    register: loadbalancerProvisioningStatus
+    until:
+    - loadbalancerProvisioningStatus.stdout is defined
+    - loadbalancerProvisioningStatus.stdout == "ACTIVE"
+    retries: 20 
+    delay: 30
+
+  - name: 'Create listeners'
+    openstack.cloud.lb_listener:
+      name: "{{ os_net2_ingress_lb }}-{{ item.protocol }}-listener"
+      state: present
+      loadbalancer: "{{ os_net2_ingress_lb }}"
+      protocol: TCP
+      protocol_port: "{{ item.port }}"
+    with_items: "{{ protocols }}"
+
+  - name: 'Create pools'
+    openstack.cloud.lb_pool:
+      name: "{{ os_net2_ingress_lb }}-{{ item.protocol }}-pool"
+      state: present
+      listener: "{{ os_net2_ingress_lb }}-{{ item.protocol }}-listener"
+      protocol: TCP
+      lb_algorithm: ROUND_ROBIN
+    with_items: "{{ protocols }}"
+
+  - name: 'Create healthmonitors'
+    openstack.cloud.lb_health_monitor:
+      name: "{{ os_net2_ingress_lb }}-{{ item.protocol }}-healthmonitor"
+      state: present
+      pool: "{{ os_net2_ingress_lb }}-{{ item.protocol }}-pool"
+      expected_codes: "200,503"
+      type: "{{ item.protocol }}"
+      delay: "10"
+      max_retries: "3"
+      resp_timeout: "5"
+    with_items: "{{ protocols }}"

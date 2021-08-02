@@ -2,7 +2,7 @@
 
 set -xe
 
-ssh-keygen -t rsa -b 4096 -N '' -f openshift_key
+ssh-keygen -t ed25519 -N '' -f openshift_key -C "$(date +%d-%m-%y)"
 
 cp openshift_key.pub files/pubkey.pem
 

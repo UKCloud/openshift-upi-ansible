@@ -12,4 +12,6 @@
       os_eg_port_ingress: "{{ infraID }}-eg-ingress-port"     
       # Security groups names
       os_eg_sg_ingress: "{{ infraID }}-eg-ingress"
+      # Loadbalancer name
+      os_eg_ingress_lb: "{{ infraID }}-eg-ingress-loadbalancer"
     when: extraGateway | default(false) | bool

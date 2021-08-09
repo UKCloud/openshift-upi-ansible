@@ -21,6 +21,8 @@
   when: extraGateway | default(false) | bool
 - import_playbook: eg-network.yaml
   when: extraGateway | default(false) | bool
+- import_playbook: eg-ingress.yaml
+  when: extraGateway | default(false) | bool
 
 - import_playbook: eg-net2-routes.yaml 
   when: 

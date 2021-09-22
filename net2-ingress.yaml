@@ -42,13 +42,6 @@
       protocol_port: "{{ item.port }}"
     with_items: "{{ protocols }}"
 
-  - name: 'Restrict listener to ingress allowed sources'
-    command:
-      cmd: "openstack loadbalancer listener set {% for cidr in net2IngressAllowedSources %} --allowed-cidr {{ cidr }} {% endfor %} {{ os_eg_ingress_lb }}-{{ item.protocol }}-listener"
-    loop: "{{ protocols }}"
-    loop_control:
-      pause: 10
-
   - name: 'Create pools'
     openstack.cloud.lb_pool:
       name: "{{ os_net2_ingress_lb }}-{{ item.protocol }}-pool"
@@ -69,3 +62,10 @@
       max_retries: "3"
       resp_timeout: "5"
     with_items: "{{ protocols }}"
+
+  - name: 'Restrict listener to ingress allowed sources'
+    command:
+      cmd: "openstack loadbalancer listener set {% for cidr in net2IngressAllowedSources %} --allowed-cidr {{ cidr }} {% endfor %} {{ os_eg_ingress_lb }}-{{ item.protocol }}-listener"
+    loop: "{{ protocols }}"
+    loop_control:
+      pause: 10

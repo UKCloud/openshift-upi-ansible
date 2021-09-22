@@ -42,6 +42,13 @@
       protocol_port: "{{ item.port }}"
     with_items: "{{ protocols }}"
 
+  - name: 'Restrict listener to ingress allowed sources'
+    command:
+      cmd: "openstack loadbalancer listener set {% for cidr in egIngressAllowedSources %} --allowed-cidr {{ cidr }} {% endfor %} {{ os_eg_ingress_lb }}-{{ item.protocol }}-listener"
+    loop: "{{ protocols }}"
+    loop_control:
+      pause: 10
+
   - name: 'Create pools'
     openstack.cloud.lb_pool:
       name: "{{ os_eg_ingress_lb }}-{{ item.protocol }}-pool"

@@ -490,19 +490,3 @@
       protocol: tcp
       port_range_min: 443
       port_range_max: 443
-
-  - name: 'Create net2-ingress-sg rule "Net2 Ingress HTTP loadbalancer"'
-    os_security_group_rule:
-      security_group: "{{ os_net2_sg_ingress }}"
-      remote_ip_prefix: "{{ os_net2_ingressVIP }}"
-      protocol: tcp
-      port_range_min: 80
-      port_range_max: 80
-
-  - name: 'Create net2-ingress-sg rule "Net2 Ingress HTTPS loadbalancer"'
-    os_security_group_rule:
-      security_group: "{{ os_net2_sg_ingress }}"
-      remote_ip_prefix: "{{ os_net2_ingressVIP }}"
-      protocol: tcp
-      port_range_min: 443
-      port_range_max: 443

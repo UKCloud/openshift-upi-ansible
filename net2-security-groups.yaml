@@ -475,7 +475,7 @@
       port_range_min: 6443
       port_range_max: 6443
 
-  - name: 'Create net2-ingress-sg rule "Ingress HTTP"'
+  - name: 'Create net2-ingress-sg rule "net2 Ingress HTTP"'
     os_security_group_rule:
       security_group: "{{ os_net2_sg_ingress }}"
       remote_ip_prefix: "{{ os_net2_subnet_range }}"
@@ -483,7 +483,7 @@
       port_range_min: 80
       port_range_max: 80
 
-  - name: 'Create net2-ingress-sg rule "Ingress HTTPS"'
+  - name: 'Create net2-ingress-sg rule "net2 Ingress HTTPS"'
     os_security_group_rule:
       security_group: "{{ os_net2_sg_ingress }}"
       remote_ip_prefix: "{{ os_net2_subnet_range }}"

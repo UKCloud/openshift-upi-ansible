@@ -21,7 +21,7 @@
       cmd: "openstack security group set --tag {{ cluster_id_tag }} {{ os_eg_sg_ingress }} "
     when: os_eg_ingress_fip is defined and os_eg_ingress_fip|length>0
 
-  - name: 'Create eg-ingress-sg rule "Extra Gateway Ingress HTTP loadbalancer"'
+  - name: 'Create eg-ingress-sg rule "Extra Gateway Ingress HTTP"'
     os_security_group_rule:
       security_group: "{{ os_eg_sg_ingress }}"
       remote_ip_prefix: "{{ os_subnet_range }}"
@@ -30,7 +30,7 @@
       port_range_max: 30080
     when: os_eg_ingress_fip is defined and os_eg_ingress_fip|length>0    
 
-  - name: 'Create eg-ingress-sg rule "Extra Gateway Ingress HTTPS loadbalancer"'
+  - name: 'Create eg-ingress-sg rule "Extra Gateway Ingress HTTPS"'
     os_security_group_rule:
       security_group: "{{ os_eg_sg_ingress }}"
       remote_ip_prefix: "{{ os_subnet_range }}"

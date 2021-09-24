@@ -54,6 +54,10 @@ spec:
           - filter: {}
             name: "{{ clusterID }}-ingress-pingdom"
 {% endif %}
+{% if (extraGateway | default(false) | bool) %}
+          - filter: {}
+            name: "{{ clusterID }}-eg-ingress"
+{% endif %}
           serverMetadata:
             Name: "{{ clusterID }}-infra"
             openshiftClusterID: "{{ clusterID }}"
@@ -62,4 +66,3 @@ spec:
           trunk: true
           userDataSecret:
             name: infra-user-data
-

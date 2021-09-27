@@ -19,7 +19,7 @@
 
   tasks:
   # Unable to use openstack.cloud.loadbalancer since it errors with 400 (Validation failure: Invalid flavor_id)
-  - name: 'Create loadbalancer'
+  - name: 'Create loadbalancer (needs python-octaviaclient>=2.4.0 - see pip-requirements.txt)'
     command:
       cmd: openstack loadbalancer create --name "{{ os_net2_ingress_lb }}" --vip-port-id "{{ os_net2_port_ingress }}" --tag "{{ cluster_id_tag }}"
 

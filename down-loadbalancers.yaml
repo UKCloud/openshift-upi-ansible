@@ -1,0 +1,21 @@
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+
+- import_playbook: common.yaml
+
+- hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: 'List loadbalancers'
+    command:
+      cmd: "openstack loadbalancer list --tags {{ cluster_id_tag }} -f value -c id"
+    register: loadbalancers
+
+  - name: 'Remove the ingress loadbalancers'
+    command:
+      cmd: "openstack loadbalancer delete {{ item.1 }} --cascade"
+    with_indexed_items: "{{ loadbalancers.stdout_lines }}"

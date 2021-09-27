@@ -3,7 +3,6 @@ kind: MachineSet
 metadata:
   labels:
     machine.openshift.io/cluster-api-cluster: "{{ clusterID }}"
-  name: "{{ clusterID }}-infra"
   name: "{{ ( custID + '-' + infraFlavor ) | replace('.','-') | replace('ocp-','') | replace('app-','') | replace('infra-','') }}-infra"
   namespace: openshift-machine-api
 spec:

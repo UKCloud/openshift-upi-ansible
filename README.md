@@ -5,31 +5,20 @@ To run deployment fill out `vars.yml` and `files/pull-secret.txt`, and then run:
 
 `./deploy.sh`
 
-The rhcos image, floating IP creation and pull-secret are not currently part of the code and need to be created/downloaded manually, and then referenced in `vars.yml`
+The rhcos image and floating IP creation are not currently part of the code and need to be created/uploaded, and then referenced in `vars.yml`
 
-Tested with ...
+Tested with the versions in `pip-requirements.txt` ...
 
 ```
-PIP Package            Version
----------------------- ---------
-ansible                2.10.5
-ansible-base           2.10.4
-openstacksdk           0.52.0
-
-Collection        Version
------------------ -------
-community.general 2.4.0
-openstack.cloud   1.2.0
+pip install -r pip-requirements.txt
 ```
 
 ## Rough method for destroying cluster (for testing ONLY)
 ```
-oc delete IngressControllers --all -n openshift-ingress-operator      
-sleep 10
+oc delete project ukc-ingress 
 oc delete MachineSets --all -n openshift-machine-api
-sleep 60
-# Default IC never dies ...
-oc scale IngressControllers default --replicas=0 -n openshift-ingress-operator
+oc scale IngressControllers --all --replicas=0 -n openshift-ingress-operator
+oc delete pdb prometheus-adapter thanos-querier-pdb -n openshift-monitoring
 # Wait for workers/infra/net2 to vanish - last worker takes ages...
 watch -n5 oc get nodes
 

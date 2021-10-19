@@ -5,12 +5,12 @@
       state: absent
       name: "{{ item }}"
     loop:
-    - "worker-default"
-    - "infra"
-    - "controlplane"
+    - "{{ custID }}-worker-default"
+    - "{{ custID }}-infra"
+    - "{{ custID }}-controlplane"
 
   - name: Remove net2 server group
     openstack.cloud.server_group:
       state: absent
-      name: "worker-net2"
+      name: "{{ custID }}-worker-net2"
     when: net2 | default(false) | bool

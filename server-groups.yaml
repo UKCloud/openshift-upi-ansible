@@ -3,7 +3,7 @@
   - name: Create default worker server group
     openstack.cloud.server_group:
       state: present
-      name: worker-default
+      name: "{{ custID }}-worker-default"
       policies:
       - soft-anti-affinity
     register: workerDefault
@@ -11,7 +11,7 @@
   - name: Create infra server group
     openstack.cloud.server_group:
       state: present
-      name: infra
+      name: "{{ custID }}-infra"
       policies:
       - anti-affinity
     register: infraGroup
@@ -19,7 +19,7 @@
   - name: Create controlplane server group
     openstack.cloud.server_group:
       state: present
-      name: controlplane
+      name: "{{ custID }}-controlplane"
       policies:
       - anti-affinity
     register: controlplaneGroup 
@@ -27,7 +27,7 @@
   - name: Create net2 worker server group
     openstack.cloud.server_group:
       state: present
-      name: worker-net2
+      name: "{{ custID }}-worker-net2"
       policies:
       - soft-anti-affinity
     register: workerNet2Group

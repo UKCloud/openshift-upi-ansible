@@ -65,7 +65,7 @@
 
   - name: 'Restrict listener to ingress allowed sources'
     command:
-      cmd: "openstack loadbalancer listener set {% for cidr in net2IngressAllowedSources %} --allowed-cidr {{ cidr }} {% endfor %} {{ os_eg_ingress_lb }}-{{ item.protocol }}-listener"
+      cmd: "openstack loadbalancer listener set {% for cidr in net2IngressAllowedSources %} --allowed-cidr {{ cidr }} {% endfor %} {{ os_net2_ingress_lb }}-{{ item.protocol }}-listener"
     loop: "{{ protocols }}"
     loop_control:
       pause: 10

@@ -1,0 +1,22 @@
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+
+- import_playbook: common.yaml
+- import_playbook: nodeport-loadbalance-common.yaml
+
+- hosts: all
+  gather_facts: no
+
+  tasks:
+  - name: 'Create loadbalancer'
+    openstack.cloud.loadbalancer:
+      state: present
+      name: "{{ os_node_port_lb }}"
+      vip_port: "{{ os_node_port_lb_port_name }}"
+
+  - name: Tag loadbalancer
+    ansible.builtin.shell:
+      cmd: openstack loadbalancer set "{{ os_node_port_lb }}"  --tag "{{ cluster_id_tag }}"

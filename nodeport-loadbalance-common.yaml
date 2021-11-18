@@ -1,0 +1,14 @@
+- hosts: localhost
+  gather_facts: no
+
+  vars_files:
+    - metadata.json
+
+  tasks:
+
+  - name: 'NodePort loadbalancing resource names'
+    set_fact:
+      os_node_port_lb: "{{ infraID }}-nodeport-loadbalancer"
+      os_node_port_lb_network: "{{ infraID }}-network"
+      os_node_port_lb_port_name: "{{ infraID }}-nodeport-loadbalancer-port"
+    when: nodePortLb | default(false) | bool

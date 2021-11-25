@@ -32,8 +32,6 @@
 - import_playbook: bootstrap.yaml
 - import_playbook: control-plane.yaml
 
-- import_playbook: nodeport-loadbalance-security.yaml
-  when: nodePortLb | default(false) | bool
 - import_playbook: nodeport-loadbalance-network.yaml
   when: nodePortLb | default(false) | bool
 - import_playbook: nodeport-loadbalance-ingress.yaml

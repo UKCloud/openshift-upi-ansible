@@ -13,7 +13,7 @@
 
   tasks:
 
-  - name: Create port for laodbalancer VIP
+  - name: Create port for loadbalancer VIP
     openstack.cloud.port:
       state: present
       name: "{{ os_node_port_lb_port_name }}"

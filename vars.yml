@@ -109,7 +109,7 @@ installConfigExtraParams: |
 
 
 #################################################################################################################
-# NodePort Loadbalanceing
+# NodePort Loadbalancing
 # If there is a customer requirement to expose applications via a NodePort then this setting would allow us
 # to deploy a Octavia Loadbalancer in OpenStack to loadbalancer TCP traffic to each worker exposing a NodePort
 

@@ -114,4 +114,4 @@ installConfigExtraParams: |
 # to deploy a Octavia Loadbalancer in OpenStack to loadbalancer TCP traffic to each worker exposing a NodePort
 
 nodePortLb: False
-nodePortLbFloatingIP: <public floating point ip>
+nodePortLbFloatingIP: <Public floating IP address for loadbalancer>

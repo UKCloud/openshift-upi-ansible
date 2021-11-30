@@ -16,6 +16,7 @@
       state: present
       name: "{{ os_node_port_lb }}"
       vip_port: "{{ os_node_port_lb_port_name }}"
+      timeout: 240
 
   - name: Tag loadbalancer
     ansible.builtin.shell:

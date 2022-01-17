@@ -1,0 +1,37 @@
+# Required Python packages:
+#
+# ansible
+# openstackclient
+# openstacksdk
+# netaddr
+
+- import_playbook: common.yaml
+- import_playbook: nodeport-loadbalance-common.yaml
+
+- hosts: all
+  gather_facts: no
+
+  tasks:
+
+  - name: Create port for loadbalancer VIP
+    openstack.cloud.port:
+      state: present
+      name: "{{ os_node_port_lb_port_name }}"
+      network: "{{ os_node_port_lb_network }}"
+    register: VIP
+
+  - name: Set port tag
+    ansible.builtin.shell:
+      cmd: openstack port set --tag "{{ cluster_id_tag }}" "{{ VIP.id }}"
+
+  - name: Get floating IP id
+    ansible.builtin.shell:
+      cmd: openstack floating ip show "{{ os_nodeport_floating_ip }}" -c id -f value
+    register: floatingIPID
+
+  - name: Associate VIP with FIP
+    ansible.builtin.shell:
+      cmd: openstack floating ip set --port "{{ VIP.id }}" "{{ floatingIPID.stdout_lines[0] }}"
+
+
+      

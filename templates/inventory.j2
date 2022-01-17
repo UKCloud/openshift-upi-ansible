@@ -27,6 +27,13 @@ all:
 
 {% endif %}
 
+{% if nodePortLb | default(false) | bool %}
+      # NodePort loadbalancing values
+      os_nodeport_network: "{{ ospSubnet }}"
+      os_nodeport_floating_ip: "{{ nodePortLbFloatingIP }}"
+
+{% endif %}
+
       # Service subnet cidr
       svc_subnet_range: '172.30.0.0/16'
       os_svc_network_range: '172.30.0.0/15'

@@ -106,3 +106,12 @@ installConfigExtraParams: |
   - mirrors:
     - privateregistry.example.com/disconnectedpath
     source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+
+
+#################################################################################################################
+# NodePort Loadbalancing
+# If there is a customer requirement to expose applications via a NodePort then this setting would allow us
+# to deploy a Octavia Loadbalancer in OpenStack to loadbalancer TCP traffic to each worker exposing a NodePort
+
+nodePortLb: False
+nodePortLbFloatingIP: <Public floating IP address for loadbalancer>

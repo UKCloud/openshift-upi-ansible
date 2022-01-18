@@ -13,6 +13,7 @@ externalNetwork: <Network cluster is on (NAME)>
 apiFIP: <FIP for controlplane (IPaddr)>
 ingressFIP: <FIP for dataplane (IPaddr)>
 bootstrapFIP: <FIP for bootstrap access (IPaddr)>
+releaseBootstrapFIP: True     # Set to false to simplify dev sandbox deployments
 apiAllowedSources: ["0.0.0.0/0"]
 ingressAllowedSources: ["0.0.0.0/0"]
 sshAllowedSources: <Add office IP, VPN IPs and internal network range in list format (List of CIDR)>

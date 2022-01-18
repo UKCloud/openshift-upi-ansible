@@ -21,3 +21,8 @@
 
   - name: Remove bootstrap glance image
     command: openstack image delete bootstrap
+
+  - name: 'Release Bootstrap Floating IP'
+    command:
+      cmd: "openstack floating ip delete {{ bootstrapFIP }}"
+    when: releaseBootstrapFIP | default(true) | bool    

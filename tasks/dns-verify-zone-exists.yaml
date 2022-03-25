@@ -2,7 +2,7 @@
   - block:
     - name: Verify zone exists
       uri:
-        url: https://api.ultradns.com/zones/{{ zone }}
+        url: "https://api.ultradns.com/zones/{{ zone }}"
         headers:
           Authorization: "Bearer {{ login_response.json.access_token }}"
         method: GET

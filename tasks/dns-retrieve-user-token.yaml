@@ -2,7 +2,7 @@
   - block:
     - name: Retrieve user token
       uri:
-        url: https://api.ultradns.com/v2/authorization/token
+        url: "https://api.ultradns.com/authorization/token"
         method: POST
         body_format: form-urlencoded
         body: "grant_type=password&username={{ neustarUltraDnsUsername }}&password={{ neustarUltraDnsPassword | urlencode() }}"

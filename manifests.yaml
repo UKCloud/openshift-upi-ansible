@@ -110,6 +110,12 @@
       insertafter: '^\s{10}image.*$'
       line: '          serverGroupID: {{ workerDefault.id }}'
 
+  - name: Remove ServerGroupName in worker server groups
+    lineinfile:
+      path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml
+      state: absent
+      regexp: 'serverGroupName'    
+
   - name: Add label for default node selector
     replace:
       path: openshift/99_openshift-cluster-api_worker-machineset-0.yaml

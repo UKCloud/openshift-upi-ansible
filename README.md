@@ -18,7 +18,8 @@ pip install -r pip-requirements.txt
 oc delete project ukc-ingress 
 oc delete MachineSets --all -n openshift-machine-api
 oc scale IngressControllers --all --replicas=0 -n openshift-ingress-operator
-oc delete pdb prometheus-adapter thanos-querier-pdb -n openshift-monitoring
+oc delete pdb prometheus-adapter thanos-querier-pdb alertmanager-main prometheus-k8s -n openshift-monitoring
+oc delete pdb prometheus-user-workload thanos-ruler-user-workload -n openshift-user-workload-monitoring
 # Wait for workers/infra/net2 to vanish - last worker takes ages...
 watch -n5 oc get nodes
 

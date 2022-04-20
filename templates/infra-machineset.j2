@@ -22,6 +22,9 @@ spec:
       metadata:
         labels:
           node-role.kubernetes.io/infra: ""
+      taints:
+      - key: node-role.kubernetes.io/infra
+        effect: NoSchedule
       providerSpec:
         value:
           apiVersion: openstackproviderconfig.openshift.io/v1alpha1
